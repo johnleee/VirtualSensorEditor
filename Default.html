@@ -1,0 +1,479 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        #wrap {
+            width: 900px;
+            margin: 0 auto;
+        }
+
+        #left_col {
+            float: left;
+            width: 300px;
+        }
+
+        #right_col {
+            float: right;
+            width: 600px;
+        }
+
+        .item {
+            position: absolute;
+            border: 1px solid black;
+            background-color: #ddddff;
+        }
+
+        #container {
+            border: 1px solid gray;
+            width: 500px;
+            height: 500px;
+        }
+
+        .title {
+            padding: 10px;
+            cursor: move;
+        }
+
+        .connect {
+            width: 100%;
+            height: 20px;
+            background-color: white;
+            cursor: pointer;
+        }
+
+
+        .window {
+            background-color: #EEEEEF;
+            border: 1px solid #346789;
+            border-radius: 0.5em;
+            box-shadow: 2px 2px 5px #AAAAAA;
+            color: black;
+            height: 5em;
+            position: absolute;
+            width: 5em;
+        }
+
+            .window:hover {
+                box-shadow: 2px 2px 19px #AAAAAA;
+                cursor: pointer;
+            }
+
+
+        .button_add, .button_add_window, .button_remove, .button {
+            background-color: deepskyblue;
+            text-align: center;
+            border: 1px solid;
+        }
+         .sensor_value_label {
+            background-color: yellow;
+            text-align: center;
+            font-weight:bold;
+        }
+
+        .button_container {
+            margin: 5px;
+            background-color: #aaaaaa;
+        }
+    </style>
+    <meta charset="utf-8" />
+    <title>Virtual Sensor Design Tool</title>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="http://jsplumbtoolkit.com/js/jquery.jsPlumb-1.4.1-all-min.js"></script>
+    <link rel="stylesheet" href="/resources/demos/style.css" />
+    <script type="text/javascript">
+        id_readable_mapping = {
+            "10170004": "B23_110",
+            "10170202": "B23_216",
+            "10170302": "B23_105B",
+            "10170206": "B23_215B",
+            "10170106": "B23_229",
+            "10170306": "B23_124",
+            "10170305": "B23_126",
+            "10170002": "B23_115",
+            "10170103": "B23_129",
+            "10170303": "B23_104",
+            "10170003": "B23_116",
+            "10170102": "B23_129A",
+            "10170104": "B23_230",
+            "10170005": "B23_109",
+            "10170307": "B23_122",
+            "10170007": "B23_211",
+            "10170304": "B23_123",
+            "10170204": "B23_214",
+            "10170203": "B23_213",
+            "10170208": "B23_217A",
+            "10170008": "B23_212",
+            "10170009": "B23_210",
+            "10170207": "B23_215",
+            "10170308": "B23_120",
+            "10170209": "B23_217B",
+            "10170006": "B23_107",
+            "10170205": "B23_214B",
+            "10170105": "B23_228",
+        };
+
+        last_reading_time_for_all_devices = {};
+        global_sensor_value = {};
+        $(function () {
+            $("#accordion").accordion({ clearStyle: true, autoHeight: false });
+        });
+
+        $.get('http://cmu-sds.herokuapp.com/get_last_reading_time_for_all_devices', function (data) {
+            //console.log(data);
+            //$('#result').html(data.length);
+            //alert('Load was performed.');
+            $('#temp').html('');
+            last_reading_time_for_all_devices = data;
+
+            $.each(id_readable_mapping, function (key, val) {
+                //var str = "<div draggable='true' ondragstart='drag(event)' id=" + key + "><header>" + val + "</header></div>";
+
+                var str_temp = "<div draggable='true' ondragstart='drag(event)' rel='temp' id=" + key + "><header>" + val + "</header></div>";
+                $('#temp').append(str_temp + '<br/>');
+
+                var str_light = "<div draggable='true' ondragstart='drag(event)' rel='light' id=" + key + "><header>" + val + "</header></div>";
+                $('#light').append(str_light + '<br/>');
+
+                var str_humidity = "<div draggable='true' ondragstart='drag(event)' rel='humidity' id=" + key + "><header>" + val + "</header></div>";
+                $('#humidity').append(str_humidity + '<br/>');
+
+                var str_audio_p2p = "<div draggable='true' ondragstart='drag(event)' rel='audio_p2p' id=" + key + "><header>" + val + "</header></div>";
+                $('#sound_level').append(str_audio_p2p + '<br/>');
+            });
+
+
+
+            setInterval(function () { myTimer() }, 5000);
+
+            function myTimer() {
+                $.get('http://cmu-sds.herokuapp.com/get_last_reading_time_for_all_devices', function (new_data) {
+                    last_reading_time_for_all_devices = new_data;
+                    //console.log(new_data);
+                });
+            }
+
+
+
+            //$("#accordion").accordion("option", "autoHeight", true);
+            //$("#accordion").accordion("refresh");
+        });
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            //ev.dataTransfer.setData("Text", ev.target.id);
+            ev.dataTransfer.setData("Text", ev.target.id + " " + $(ev.target).attr('rel'));
+            //ev.dataTransfer.setData("sensor-type", ev.target.rel );
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("Text").split(" ");
+            //.log(data[0] + " " + data[1]);
+            //console.log(data);
+            //var device_id = ev.dataTransfer.getData("device-id");
+            //var sensor_type = ev.dataTransfer.getData("sensor-type");
+            var str = "<input class='sensor_button' type='button'  rel='" + data[1] + "' value='" + data[0] + "' />"
+            $('#workspace').append(str + '<br/>');
+            //ev.target.append(data);
+            //ev.target.appendChild(document.getElementById(data));
+            $(".sensor_button").click(function () {
+                var sensor_type = $(this).attr("rel");
+                var device_id = $(this).attr("value");
+
+                var last_time = last_reading_time_for_all_devices[device_id];
+
+                var query_string = "http://cmu-sds.herokuapp.com/sensor_readings/" + device_id + "?start_time=" + last_time + "000&end_time=" + last_time + "000";
+                //console.log(query_string);
+                $.get(query_string, function (data) {
+                    //alert(data[0][sensor_type]);
+                    //console.log(data);
+                    var log_string = last_time + ":" + data[0][sensor_type];
+                    $("#log_area").append(log_string + "<br/>");
+                });
+
+            });
+        }
+
+        function drop_window(ev) {
+            ev.preventDefault();
+            if (!ev.dataTransfer)
+                return;
+            var data = ev.dataTransfer.getData("Text").split(" ");
+            if (!data)
+                return;
+            var id = "dynamic_" + $(".window").length;
+
+            if (data[1] === "virtual") {
+                $('<div class="window" id="' + id + '" >').appendTo('#plumb_area').html($(("#container1"))[0].innerHTML);
+                setInterval(function () { updateVirtualValue(id) }, 5000);
+            } else {
+                $('<div class="window" id="' + id + '" >').appendTo('#plumb_area').html($(("#container0"))[0].innerHTML);
+
+                var device_id = data[0];
+
+                var sensor_type = data[1];
+                setInterval(function () { updateValue(device_id, sensor_type, "sensor_value_" + id) }, 5000);
+                global_sensor_value["sensor_value_" + id] = "0";
+            }
+            $("#"+id).append("<div class='sensor_value_label' id='sensor_value_"+id+"'>0</div>");
+
+            //create new window and add it to the body
+ 
+            jsPlumb.draggable($('#' + id));
+
+
+        }
+
+        function updateVirtualValue(virtual_sensor_id) {
+            var data = jsPlumb.getConnections($("#" + virtual_sensor_id));
+            if (data.length == 0)
+                return;
+
+            var result = 0.0;
+            for(var i=0;i<data.length;i++){
+                console.log("source:" + data[i].sourceId + " target:" + data[i].targetId);
+                console.log("sensor_value_" + data[i].sourceId);
+                console.log($("#sensor_value_" + data[i].sourceId).innerHtml);
+                console.log(global_sensor_value["sensor_value_" + data[i].sourceId]);
+                result += parseFloat(global_sensor_value["sensor_value_" + data[i].sourceId]);
+            }
+            //alert(data.length);
+            result = result / data.length;
+            result = result.toFixed(1);
+            //if (data.length == 1)
+            //    result = global_sensor_value["sensor_value_" + data[0].sourceId];
+            $("#sensor_value_" + virtual_sensor_id).html(result);
+        }
+
+        function updateValue(device_id, sensor_type, sensor_value_id) {
+            var last_time = last_reading_time_for_all_devices[device_id];
+
+            var query_string = "http://cmu-sds.herokuapp.com/sensor_readings/" + device_id + "?start_time=" + last_time + "000&end_time=" + last_time + "000";
+
+            $.get(query_string, function (new_data) {
+ 
+                    //alert(data[0][sensor_type]);
+                    //console.log(data);
+                    //var log_string = last_time + ":" + data[0][sensor_type];
+                $("#" + sensor_value_id).html(new_data[0][sensor_type]);
+                global_sensor_value[sensor_value_id] = new_data[0][sensor_type];
+
+            });
+        }
+
+        function button_click(ev) {
+            ev.preventDefault();
+            var button_rel = $(this).attr('value');
+            alert(button_rel);
+        }
+
+        var add_source_event;
+        var delete_source_event;
+        var add_target_event;
+        var delete_target_event;
+
+        jsPlumb.ready(function () {
+
+            //FIX DOM:
+            //$(("#container1"))[0].innerHTML = $(("#container0"))[0].innerHTML;
+
+            //all windows are draggable
+            jsPlumb.draggable($(".window"));
+
+
+            var anEndpointSource = {
+                endpoint: "Rectangle",
+                isSource: true,
+                isTarget: false,
+                maxConnections: 1,
+
+                anchor: [1, 0, 1, 0]
+            };
+
+            var anEndpointDestination = {
+                endpoint: "Dot",
+                isSource: false,
+                isTarget: true,
+                maxConnections: 1,
+
+                anchor: [0, 1, -1, 0]
+            };
+
+
+            //Fixes endpoints for specified target
+            function fixEndpoints(parentnode,endpoints) {
+
+                //get list of current endpoints
+                //var endpoints = jsPlumb.getEndpoints(parentnode.id);
+                //console.log(endpoints === null);
+                //there are 2 types - input and output
+
+                var inputAr = $.grep(endpoints, function (elementOfArray, indexInArray) {
+                    return elementOfArray.isSource; //input
+                });
+
+                var outputAr = $.grep(endpoints, function (elementOfArray, indexInArray) {
+                    return elementOfArray.isTarget; //output
+                });
+
+                calculateEndpoint(inputAr, true);
+                calculateEndpoint(outputAr, false);
+
+                jsPlumb.repaintEverything();
+            }
+
+            //recalculate endpoint anchor position manually
+            function calculateEndpoint(endpointArray, isInput) {
+
+                //multiplyer
+                var mult = 1 / (endpointArray.length + 1);
+
+                for (var i = 0; i < endpointArray.length; i++) {
+
+                    if (isInput) {
+
+                        //position
+                        endpointArray[i].anchor.x = 1;
+                        endpointArray[i].anchor.y = mult * (i + 1);
+                    }
+                    else {
+
+                        //position
+                        endpointArray[i].anchor.x = 0;
+                        endpointArray[i].anchor.y = mult * (i + 1);
+                    }
+                }
+            }
+
+            //alert("js plumb triggered");
+
+            //Add additional anchor
+            //$(".button_add").on("click", function () {
+            add_source_event = function(obj){
+                var parentnode = obj.parentNode.parentNode;
+                jsPlumb.addEndpoint(
+                    parentnode,
+                    anEndpointSource
+                );
+
+                var endpoints = jsPlumb.getEndpoints(parentnode.id);
+                fixEndpoints(parentnode, endpoints);
+            }
+
+            add_target_event = function (obj) {
+                var parentnode = obj.parentNode.parentNode;
+                jsPlumb.addEndpoint(
+                    parentnode,
+                    anEndpointDestination
+                );
+
+                var endpoints = jsPlumb.getEndpoints(parentnode.id);
+                fixEndpoints(parentnode, endpoints);
+            }
+
+
+            delete_source_event = function(obj){
+                var parentnode = obj.parentNode.parentNode;
+                console.log(parentnode.id);
+                //get list of current endpoints
+                var endpoints = jsPlumb.getEndpoints(parentnode.id);
+
+                if (!endpoints)
+                    return;
+                jsPlumb.deleteEndpoint(endpoints[endpoints.length - 1]);
+                fixEndpoints(parentnode,endpoints);
+            }
+
+            delete_target_event = function (obj) {
+                var parentnode = obj.parentNode.parentNode;
+                console.log(parentnode.id);
+                //get list of current endpoints
+                var endpoints = jsPlumb.getEndpoints(parentnode.id);
+
+                if (!endpoints)
+                    return;
+                jsPlumb.deleteEndpoint(endpoints[endpoints.length - 1]);
+                fixEndpoints(parentnode, endpoints);
+            }
+
+        });
+
+
+
+
+    </script>
+</head>
+<body>
+
+    <div id="wrap">
+        <div id="left_col">
+            <div id="accordion">
+                <h3>Temperature</h3>
+                <div id="temp">
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                </div>
+                <h3>Light</h3>
+                <div id="light">
+                </div>
+                <h3>Humidity</h3>
+                <div id="humidity">
+                </div>
+                <h3>Sound</h3>
+                <div id="sound_level">
+                </div>
+                <h4>Virtual Sensor</h4>
+                <div id="virtual_sensors">
+                   <div draggable='true' ondragstart='drag(event)' rel="virtual" id="virtual1"><header>Average Sensor</header></div>
+                </div>
+            </div>
+        </div>
+        <div id="right_col">
+            <div id="workspace" ondrop="drop(event)" ondragover="allowDrop(event)" style="height: 100px; width: 600px; border: thick dotted #FF0000;">
+            </div>
+
+            <div id="plumb_area" ondrop="drop_window(event)" ondragover="allowDrop(event)" style="height: 300px; width: 600px; border: thick dotted #FF0000;">
+                <p></p>
+
+            </div>
+            <h2>Log (time:value)</h2>
+            <div id="log_area"></div>
+        </div>
+    </div>
+
+
+
+
+
+    <div  style="left: 20px;visibility:hidden" id="container0">
+        <div class="button_container">
+            <div class="button_add" onclick="add_source_event(this)">Add</div>
+            <div class="button_remove" onclick="delete_source_event(this)">Remove</div>
+        </div>
+    </div>
+    <div  style="left: 20px;visibility:hidden" id="container1">
+        <div class="button_container">
+            <div class="button_add" onclick="add_target_event(this)">Add</div>
+            <div class="button_remove" onclick="delete_target_event(this)">Remove</div>
+        </div>
+    </div>
+
+</body>
+</html>

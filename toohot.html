@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title></title>
+    <style>
+        .box {
+            /* basic styling */
+            width: 250px;
+            font: 14px Arial;
+
+            /* flexbox setup */
+            display: -webkit-box;
+            -webkit-box-orient: horizontal;
+
+            display: -moz-box;
+            -moz-box-orient: horizontal;
+
+            display: box;
+            box-orient: horizontal;
+        }
+
+        .box > div {
+            -webkit-box-flex: 1;
+            -moz-box-flex: 1;
+            box-flex: 1;
+
+            -moz-transition: width 0.7s ease;
+            -o-transition: width 0.7s ease;
+            -webkit-transition: width 0.7s ease;
+            transition: width 0.7s ease;
+        }
+
+    </style>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="styles/main_hot.css">
+    <!-- link rel="stylesheet" href="styles/main.css"-->
+    <!-- link rel="stylesheet" href="styles/topologicalView.css"-->
+    <!-- link rel="stylesheet" href="styles/timeseriesView.css"-->
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+    <script src="scripts/jquery/jquery.ui.touch-punch.min.js"></script>
+    <script src="scripts/d3/d3.v3.min.js"></script>
+    <script src="scripts/d3/d3.layout.js"></script>
+    <script src="scripts/cubism/cubism.v1.min.js"></script>
+    <script src="scripts/heatmap/heatmap.js"></script>
+    <script src="scripts/topologicalView.js"></script>
+    <script src="scripts/timeseriesView.js"></script>
+    <script src="scripts/floorView.js"></script>
+    <script src="scripts/main_hot.js"></script>
+
+</head>
+<body>
+<header id="menuBar"><img src="images/cmu_wordmark.gif">
+</header>
+<div class="box">
+    <div>
+        <div class="text-center">
+            <h2>Room: 109/110</h2>
+        </div>
+
+        <div id="geographicalView" class="text-center">
+            <div id="txt_temperature" style="font-size: 300%;"></div>
+            <small class="text-grey">Last reading: <span id="txt_last_reading_time"></span></small>
+            <br/>
+            <br/>
+        </div>
+
+        <div>
+            <div id="auction_info" >
+                <form class="form-inline" style="line-height:220%;">
+                    You have <span id="current_credits" class="label label-info">100</span> credits left!
+                    <br/>
+                    Bid <input type="text" class="input-mini" id="credits_bet"> to gain control
+                    <button class="btn btn-success" type="submit">Place!</button>
+                </form>
+                <dl class="dl-horizontal">
+                    <dt>Your last bid:</dt>
+                    <dd id="txt_your_bid">25</dd>
+                    <dt>Current auction bid:</dt>
+                    <dd id="txt_current_auction_bid">37</dd>
+                    <dt>Time left:</dt>
+                    <dd id="txt_time_left">27:04</dd>
+                </dl>
+            </div>
+            <br/>
+            <div id="set_temp" class="text-left">
+                <form class="form-inline" style="line-height:250%;">
+                    Set temperature to <input type="text" class="input-mini" id="target_temp">
+                    <button class="btn btn-success" type="submit">Set!</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
