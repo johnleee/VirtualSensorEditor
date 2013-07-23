@@ -1,0 +1,208 @@
+@font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    /*
+ 	src:local('Open Sans'), 
+ 		local('OpenSans'),
+ 		url("../font/OpenSans-Regular.ttf") format('truetype'),
+ 		url("../font/OpenSans.woff") format('woff');
+ 		 		*/
+}
+
+body {
+    background-color: white;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.cmu_layout {
+	position: relative;
+	background-color: #990000;
+	width: 100%; height: 4%;
+	border-bottom: 1px solid #555;
+	z-index: 3;
+	color: white;
+	font-size: 11px;
+}
+
+#cmu_header div#title {
+	font-family: "Modern No. 20", serif;
+	font-size: 20px;
+	padding: 0.3em;
+	padding-left: 0.5em;
+	letter-spacing: -0.8px;
+}
+
+#cmu_header nav {
+	position: absolute; right:0.2em; bottom: 0; 
+	font-weight: 700;
+}
+
+#cmu_footer {
+	text-align: right;
+}
+
+#design_canvas {
+    padding: 1px;
+    position: relative;
+    font-size: 80%;
+    width: 84%;
+    border: 1px solid #CCCCCC;
+    height: 600px;
+    overflow: hidden;
+    border-radius: 5px;
+	/*background-image: url(../img/grid.jpg);*/
+}
+
+.window {
+    background-color: #FFFFFF;
+    cursor: pointer;
+    box-shadow: 2px 2px 19px #aaa;
+    -o-box-shadow: 2px 2px 19px #aaa;
+    -webkit-box-shadow: 2px 2px 19px #aaa;
+    -moz-box-shadow: 2px 2px 19px #aaa;
+
+    border: 1px solid #BBBBBB;
+    -moz-border-radius: 0.5em;
+    border-radius: 0.5em;
+    opacity: 0.8;
+    filter: alpha(opacity = 80);
+    text-align: left;
+
+    z-index: 20;
+    position: absolute;
+    background-color: #FFFFFF;
+    color: black;
+    font-family: helvetica;
+    padding: 0.5em;
+    font-size: 0.9em;
+}
+
+.window:hover {
+    box-shadow: 2px 2px 19px #444;
+    -o-box-shadow: 2px 2px 19px #444;
+    -webkit-box-shadow: 2px 2px 19px #444;
+    -moz-box-shadow: 2px 2px 19px #444;
+    opacity: 0.6;
+    filter: alpha(opacity = 60);
+
+}
+
+.window_output {
+    border: 1px solid #BBBBBB;
+    background-color: #FFFFFF;
+    cursor: pointer;
+
+    box-shadow: 2px 2px 19px #aaa;
+    -o-box-shadow: 2px 2px 19px #aaa;
+    -webkit-box-shadow: 2px 2px 19px #aaa;
+    -moz-box-shadow: 2px 2px 19px #aaa;
+
+    -moz-border-radius: 0.5em;
+    border-radius: 0.5em;
+
+    z-index: 20;
+    position: absolute;
+
+    background-color: #FFFFFF;
+    color: black;
+    font-family: helvetica;
+    padding: 0.5em;
+    font-size: 0.9em;
+}
+
+path, ._jsPlumb_endpoint {
+    cursor: pointer;
+}
+
+/* z index stuff. windows are at z-index 24. */
+
+._jsPlumb_connector {
+    z-index: 18;
+}
+
+._jsPlumb_endpoint {
+    z-index: 19;
+}
+
+._jsPlumb_overlay {
+    z-index: 20;
+}
+
+._jsPlumb_connector._jsPlumb_hover {
+    z-index: 21 !important;
+}
+
+._jsPlumb_endpoint._jsPlumb_hover {
+    z-index: 22 !important;
+}
+
+._jsPlumb_overlay._jsPlumb_hover {
+    z-index: 23 !important;
+}
+
+._jsPlumb_connector {
+    z-index: 4;
+}
+
+._jsPlumb_endpoint, .endpointTargetLabel, .endpointSourceLabel {
+    z-index: 21;
+    cursor: pointer;
+    font-weight:bold;
+}
+
+._jsPlumb_dragging {
+    z-index: 4000;
+}
+
+#accordion_container {
+    float: left;
+    width: 15%;
+    height: 600px;
+}
+
+.label-physical {
+    background-color: #0000FF;
+}
+
+.label-virtual {
+    background-color: #00CC00;
+}
+
+.label-template {
+    background-color: #f89406;
+}
+
+.sensor_value {
+    color: red;
+    font-size: x-large;
+    font-weight: bolder;
+}
+
+.container_export_import {
+    padding-top: 7px;
+}
+
+.code_textarea {
+    height:100px;
+    width: 250px;
+}
+
+.addEndPoint, .removeEndPoint {
+    font-size: 15px;
+    color: #BBBBBB;
+}
+.addEndPoint:hover, .removeEndPoint:hover {
+    color: #0000FF;
+    font-weight:bold;
+}
+.project_title {
+    color:white;
+    font-size:x-large;
+    font-weight:bold;
+    margin-left:200px;
+    padding-top:10px;
+}
+.siren_image {
+    text-align:center;
+}
