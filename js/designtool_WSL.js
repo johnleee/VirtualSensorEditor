@@ -1,5 +1,6 @@
-﻿
-function setupAjaxTimer(deviceId) {
+﻿/// <reference path="designtool_PRE.js" />
+
+function setupAjaxTimer_quarentine(deviceId) {
     var lastTime = last_reading_time_for_all_devices[deviceId];
 
     var query_string = hostname + "/sensor_readings/" + deviceId + "?start_time=" + lastTime + "000&end_time=" + lastTime + "000";
@@ -8,7 +9,7 @@ function setupAjaxTimer(deviceId) {
     });
 }
 
-function calcGlobalControlDeviceValue() {
+function calcGlobalControlDeviceValue_quarentine() {
     for (var deviceID in globalDeviceValue) {
         if (!globalDeviceValue[deviceID]) {
             globalDeviceValue[deviceID] = {};
@@ -21,33 +22,32 @@ function calcGlobalControlDeviceValue() {
 }
 
 function initPhysicalSensor() {
-    $.get(hostname + "/last_readings_from_all_devices/1374158197000/digital_temp/json", function (data) {
-        globalPhysicalSensorData['digital_temp'] = JSON.parse(data);
-    });
-
-    $.get(hostname + "/last_readings_from_all_devices/1374158197000/light/json", function (data) {
-        globalPhysicalSensorData['light'] = JSON.parse(data);
-    });
-
-    $.get(hostname + "/last_readings_from_all_devices/1374158197000/humidity/json", function (data) {
-        globalPhysicalSensorData['humidity'] = JSON.parse(data);
-    });
-
-    $.get(hostname + "/last_readings_from_all_devices/1374158197000/audio_p2p/json", function (data) {
-        globalPhysicalSensorData['audio_p2p'] = JSON.parse(data);
-    });
-
-    $.get(hostname + "/last_readings_from_all_devices/1374158197000/motion/json", function (data) {
-        globalPhysicalSensorData['motion'] = JSON.parse(data);
-    });
+    for (var key in idReadableMapping) {
+        globalPhysicalSensorData[key] = {};
+        globalPhysicalSensorData[key]["digital_temp"] = {};
+        globalPhysicalSensorData[key]["light"] = {};
+        globalPhysicalSensorData[key]["humidity"] = {};
+        globalPhysicalSensorData[key]["audio_p2p"] = {};
+        globalPhysicalSensorData[key]["motion"] = {};
+    }
 }
 
 function sensorTimer(sensorType) {
-    var urlString = hostname + "/last_readings_from_all_devices/" + new Date().getTime() + "/" + sensorType + "/json";
+    //http://cmu-sensor-network.herokuapp.com/lastest_readings_from_all_devices/temp
+
+    var urlString = hostname + "/lastest_readings_from_all_devices/" + sensorType + "/json";
     $.get(urlString, function (newData) {
-        if (newData == "no reading found")
-            return;
-        globalPhysicalSensorData[sensorType] = JSON.parse(newData);
+        //if (newData == "no reading found")
+        //    return;
+        //globalPhysicalSensorData[sensorType] = JSON.parse(newData);
+        var jsonData = JSON.parse(newData);
+        for (var i = 0; i < jsonData.length; i++) {
+            var deviceID = jsonData[i]["device_id"];
+            if (globalPhysicalSensorData[deviceID] == undefined)
+                continue;
+            globalPhysicalSensorData[deviceID][sensorType]["value"] = jsonData[i]["value"];
+            globalPhysicalSensorData[deviceID][sensorType]["timestamp"] = jsonData[i]["timestamp"];
+        }
     });
 }
 

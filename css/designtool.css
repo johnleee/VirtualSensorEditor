@@ -177,6 +177,7 @@ path, ._jsPlumb_endpoint {
     color: red;
     font-size: x-large;
     font-weight: bolder;
+    text-align: center;
 }
 
 .container_export_import {
@@ -184,8 +185,9 @@ path, ._jsPlumb_endpoint {
 }
 
 .code_textarea {
-    height:100px;
-    width: 250px;
+    height:150px;
+    width: 260px;
+    margin-bottom: 4px;
 }
 
 .addEndPoint, .removeEndPoint {
@@ -205,4 +207,32 @@ path, ._jsPlumb_endpoint {
 }
 .siren_image {
     text-align:center;
+}
+
+.vsChartContainer {
+    position: absolute;
+    top: 25px;
+    left: 2px;
+    width: 280px;
+    height: 195px;
+    z-index: -1;
+    font: 8px sans-serif;
+    background-color: #FFFFFF;
+    visibility:hidden;
+}
+
+.background {
+    fill: #FFFFFF;
+}
+
+line {
+    shape-rendering: crispEdges;
+    stroke: #BBBBBB;
+    opacity: 0.1;
+}
+
+path.dvl {
+    stroke: #2e2aF8;
+    fill: none;
+    stroke-width: 2;
 }
