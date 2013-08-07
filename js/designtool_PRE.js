@@ -56,7 +56,11 @@ idReadableMapping = {
     "10170209":"B23_217B",
     "10170105":"B23_228",
     "10170106":"B23_229",
-    "10170104":"B23_230"
+    "10170104":"B23_230",
+    "235b1952f5cfc4ee": "213_A",
+    "23295052f5cfc4ee": "213_B",
+    "23703752f5cfc4ee": "213_C",
+    "23366552f5cfc4ee": "213_D"
 };
 
 
@@ -266,16 +270,27 @@ function createNewPhysicalSensorInCanvas(id, data) {
     $('<div class="window" id="' + id + '" >').appendTo('#design_canvas');
     jsPlumb.addEndpoint($("#" + id), sourceEndpoint);
     $("#" + id).append("<div class='label label-physical' id='label_" + id + "'>" + data.name + "</div>");
-    $("#" + id).append("<div class='sensor_value' id='sensor_value_" + id + "'>0</div>");
+    $("#" + id).append("<div id='vsFuncCont_" + id + "'><div class='sensor_value' id='sensor_value_" + id + "'>0</div>");
     $("#" + id).append("<input type='hidden' id='hidden_field_status_sensor_value_" + id + "'  />");
+    $("#" + id).append("<input type='hidden' id='hidden_field_status_sensor_value_" + id + "' /></div>");
+    $("#" + id).append("<div class='vsChartContainer' id='vsChartCont_" + id  + "' >&nbsp</div>");
     globalSensorInfo[id] = { "category": "physical", "sensorType": data.type, "deviceID":data.device_id };
 
-    $("#" + id).append("<input type='hidden' id='hidden_field_status_sensor_value_" + id + "' />");
+    globalSensorChartsInfo[id] = dvl();
+    setupChart(id, 180, 120);
 
     globalSensorInfo[id] = { "category":"physical", "sensorType":data.sensorType, "deviceID":data.deviceID, "name":data.name};
     var setIntervalId = setInterval(function () {
         $("#sensor_value_" + id).css("color", readSensorStatus(id));
-        $("#sensor_value_" + id).html(readSensorData(id, true));
+        var temp = readSensorData(id, true);
+        $("#sensor_value_" + id).html(temp);
+        if ((typeof temp == 'boolean')){
+            globalSensorChartsInfo[id].value(temp);
+        }else{
+            if (temp > 0){
+                globalSensorChartsInfo[id].value(temp);
+            }
+        }
     }, 3000);
     globalSensorInfo[id]["setIntervalId"] = setIntervalId;
 }
@@ -284,14 +299,24 @@ function createNewVirtualSensorInCanvas(id, data) {
     $('<div class="window" id="' + id + '" >').appendTo('#design_canvas');
     jsPlumb.addEndpoint($("#" + id), sourceEndpoint);
     $("#" + id).append("<div class='label label-virtual' id='label_" + id + "'>" + data.name + "</div>");
-    $("#" + id).append("<div class='sensor_value' id='sensor_value_" + id + "'>0</div>");
+    $("#" + id).append("<div id='vsFuncCont_" + id + "'><div class='sensor_value' id='sensor_value_" + id + "'>0</div></div>");
+    $("#" + id).append("<div class='vsChartContainer' id='vsChartCont_" + id  + "' >&nbsp</div>");
     unfoldVirtualSensor(data.name);
     globalSensorInfo[id] = {"category":"virtual", "name":data.name, "source": storageObj["VIRTUAL_SENSORS"][data.name]["components"][0]["uuid"]};
-
+    globalSensorChartsInfo[id] = dvl();
+    setupChart(id, 180, 120);
 
     var setIntervalId = setInterval(function () {
         $("#sensor_value_" + id).css("color", readSensorStatus(id));
-        $("#sensor_value_" + id).html(readSensorData(id, true));
+        var temp = readSensorData(id, true);
+        $("#sensor_value_" + id).html(temp);
+        if ((typeof temp == 'boolean')){
+            globalSensorChartsInfo[id].value(temp);
+        }else{
+            if (temp > 0){
+                globalSensorChartsInfo[id].value(temp);
+            }
+        }
     }, 1000);
 
     globalSensorInfo[id]["setIntervalId"] = setIntervalId;
@@ -305,15 +330,15 @@ function createNewTemplateInCanvas(id, data) {
     }
     $('<div class="window" id="' + id + '" >').appendTo('#design_canvas');
     $("#" + id).append("<span class='label label-template' id='label_" + id + "'>" + data.name + "_" + templates_counter++ + "</span>"+
-    "&nbsp; <span class='removeEndPoint' onclick='removeTargetEndpoint(this);'>  - </span>(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<span class='addEndPoint' onclick='addTargetEndpoint(this);'> + </span><br/>" +
-    "<div id='vsFuncCont_" + id + "'><textarea class='code_textarea' id=textarea_" + id + " contenteditable='true'>" + expression + "</textarea><br/>"+
+    "&nbsp; <span class='removeEndPoint' onclick='removeTargetEndpoint(this);'> -</span>(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<span class='addEndPoint' onclick='addTargetEndpoint(this);'>+</span><br/>" +
+    "<div class='vsFunctionContainer' id='vsFuncCont_" + id + "'><textarea class='code_textarea' id=textarea_" + id + " contenteditable='true'>" + expression + "</textarea><br/>"+
     "<input type='button' class='btn' value='Set' name='" + id + "' onclick='setCustomFunction(\"" + id + "\");'  />"+
-    "&nbsp; &nbsp; &nbsp; <span class='sensor_value' style='display:inline-block; width:100px;' id='sensor_value_" + id + "' >0</span>"+
+    "&nbsp; &nbsp; &nbsp; <span class='sensor_value' style='display:inline-block;' id='sensor_value_" + id + "' >0</span>"+
     "<input type='hidden' id='hidden_code_" + id + "' />"+
     "<input type='hidden' id='hidden_field_is_valid_" + id + "' value='false' />"+
     "<input type='hidden' id='hidden_field_status_sensor_value_" + id + "' />"+
     "<input type='hidden' id='hidden_field_uuid_" + id + "' value='" + createUUID("c") + "'/></div>"+
-    "<div class='vsChartContainer' id='vsChartCont_" + id  + "' >&nbsp</div>");
+    "<div class='vsChartContainer' no id='vsChartCont_" + id  + "' >&nbsp</div>");
     jsPlumb.addEndpoint($("#" + id), sourceEndpoint);
 
     if (typeof data.children != 'undefined' && data.children.length > 1) {
@@ -326,7 +351,7 @@ function createNewTemplateInCanvas(id, data) {
 
     globalSensorInfo[id] = {"category":"custom", name: data.name};
     globalSensorChartsInfo[id] = dvl();
-    setupChart(id);
+    setupChart(id, 275, 195);
     var setIntervalId = setInterval(function () {
         if ($("#hidden_field_is_valid_" + id).val() === "false")
             return;
@@ -334,7 +359,7 @@ function createNewTemplateInCanvas(id, data) {
         var temp = readSensorData(id, true);
         $("#sensor_value_" + id).html(temp);
         globalSensorChartsInfo[id].value(temp);
-    }, 2000);
+    }, 1000);
 
     globalSensorInfo[id]["setIntervalId"] = setIntervalId;
 }
@@ -542,7 +567,7 @@ function calculateEndpointPosition(endpointArray) {
     var div = (endpointArray.length + 1);
 
     for (var i = 0; i < endpointArray.length; i++) {
-        endpointArray[i].anchor.x = 0.31 + ((i + 1) / div) * 0.65;
+        endpointArray[i].anchor.x = 0.32 + ((i + 1) / div) * 0.65;
         endpointArray[i].anchor.y = 0;
     }
 }
@@ -555,7 +580,7 @@ function addTargetEndpoint(obj, isParent) {
     }
 
     var targetEndpoints = getEndPointsOfElement(parentnode, "target");
-    if (targetEndpoints.length < 7) {
+    if (targetEndpoints.length < 12) {
         var ep = jsPlumb.addEndpoint(parentnode, targetEndpoint);
         var varName = String.fromCharCode(65 + targetEndpoints.length);
         ep.addOverlay([ "Label", { location:[0.5, 1.8], label:varName, cssClass:"endpointTargetLabel" } ]);
@@ -625,19 +650,19 @@ function getEndPointsOfElement(element, typeEndPoint) {
 
 
 
-function setupChart(id){
+function setupChart(id, chartWidth, chartHeight){
     var data = dvl.recorder({
         data:globalSensorChartsInfo[id],
         value:'value',
         timestamp:'time',
-        max:150
+        max:90
     })
 
     var getX = dvl.acc('time');
     var getY = dvl.acc('value');
     var margin = { top:5, bottom:20, left:0, right:23 };
-    var width = dvl(275);
-    var height = dvl(195);
+    var width = dvl(chartWidth);
+    var height = dvl(chartHeight);
     var innerWidth = dvl.op.sub(width, margin.left, margin.right);
     var innerHeight = dvl.op.sub(height, margin.top, margin.bottom);
     var transition = { duration:300 }
@@ -805,10 +830,84 @@ function setupChart(id){
 
 function codeView(elem, askConfirmation) {
     $('#vsFuncCont_'+elem.id).css('visibility','visible');
+    $('#vsFuncCont_'+elem.id).show();
     $('#vsChartCont_'+elem.id).css('visibility','hidden');
+    $('#vsChartCont_'+elem.id).hide();
+    jsPlumb.repaintEverything();
 }
 
 function timeSeriesView(elem, askConfirmation) {
     $('#vsFuncCont_'+elem.id).css('visibility','hidden');
+    $('#vsFuncCont_'+elem.id).hide();
     $('#vsChartCont_'+elem.id).css('visibility','visible');
+    $('#vsChartCont_'+elem.id).show();
+    jsPlumb.repaintEverything();
+}
+
+function toggleViewMode(mode){
+    for (var id in globalSensorChartsInfo) {
+        if (mode == 'code'){
+            codeView({id:id}, false);
+        }else{
+            timeSeriesView({id:id}, false);
+        }
+    }
+}
+
+function startIntro(){
+    var intro = introJs().onchange(function(targetElement) {
+        $(targetElement).show();
+        //alert(targetElement);
+    });
+    intro.setOptions({
+        steps: [
+            {
+                element: document.querySelector('#temp'),
+                intro: "These are physical sensors. You can drag ...",
+                position: 'right'
+            },
+            {
+                element: '#design_canvas',
+                intro: "&nbsp;&nbsp;&nbsp;&nbsp;and drop them here --> <br>&nbsp;&nbsp;&nbsp;&nbsp;This is the <strong>canvas</strong>",
+                position: 'left'
+            },
+            {
+                element: '#virtual_sensors_templates',
+                intro: 'These are the building blocks',
+                position: 'right'
+            },
+            {
+                element: '#template1',
+                intro: "Use FUNCTION to define the virtual sensor logic. You can use Javascript.",
+                position: 'bottom'
+            },
+            {
+                element: '#template1',
+                intro: "Just drag it to the canvas and <strong>connect</strong> the physical sensors to the FUNCTION <strong>parameters</strong>",
+                position: 'bottom'
+            },
+            {
+                element: '#template1',
+                intro: "Then write some code like:<br/><br/><strong>return [A, B, C].mean();</strong><br/><br/><small>This will return the mean of the parameters</small>",
+                position: 'bottom'
+            },
+            {
+                element: '#help',
+                intro: "Here is the list of all statistical functions currently supported",
+                position: 'bottom'
+            },
+            {
+                element: '#viewMode',
+                intro: 'While editing a virtual sensor, try the graph view!',
+                position: 'right'
+            },
+            {
+                element: document.querySelector('#virtual_sensors_instances_title'),
+                intro: 'Once you finish ... <br/>All the saved virtual sensors will be here. Enjoy!',
+                position: 'right'
+            }
+        ]
+    });
+
+    intro.start();
 }

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/designtool.css">
     <link rel="stylesheet" href="css/jquery.contextMenu.css" type="text/css" />
     <link rel="stylesheet" href="css/navi-menu.css" type="text/css" />
+    <link rel="stylesheet" href="css/introjs.css" type="text/css" />
 
     <script src="js/lib/jquery-1.9.0-min.js"></script>
     <script src="js/lib/jquery-ui-1.9.2-min.js"></script>
@@ -17,12 +18,11 @@
     <script src="js/lib/jquery.contextMenu.js" type="text/javascript"></script>
     <script src="js/lib/dvl.js" type="text/javascript"></script>
     <script src="js/lib/d3.v2.js" type="text/javascript"></script>
+    <script src="js/lib/intro.js" type="text/javascript"></script>
     <script src="js/designtool_BLL.js"></script>
     <script src="js/designtool_WSL.js"></script>
     <script src="js/designtool_PRE.js"></script>
     <script type='text/javascript' src='js/lib/psMathStats.min.js'></script>
-    <script type="text/javascript" src="http://www.jstat.org/js/jstat-1.0.0.min.js"></script>
-    <!--script src="http://www.flotcharts.org/flot/jquery.flot.js"></script-->
     <script src="js/context-menu.js"></script>
 </head>
 <body data-demo-id="flowchartConnectorsDemo" data-library="jquery">
@@ -31,10 +31,10 @@
 	<div id="title">
 		Carnegie Mellon University<br/>Virtual Sensor Design Tool
 	</div>
-	
 	<nav>
 		<div class="menu">
 			<ul>
+                <li>&nbsp;<input type="button" onclick="startIntro();" value="Intro" class=" btn btn-success">&nbsp;</li>
 				<li><a class="hide" id="help" href="help.html" target="_blank">HELP</a></li>
 				<li><a class="hide" href="http://clydeli.github.io/sn-visualization/dev" target="_blank">VISUALIZATION</a></li>
 				<li>
@@ -89,7 +89,7 @@
         <h4>Motion</h4>
         <div id="motion">
         </div>
-        <h4>Virtual sensors</h4>
+        <h4 id="virtual_sensors_instances_title">Virtual sensors</h4>
         <div id="virtual_sensors_instances">
         </div>
 
@@ -109,18 +109,19 @@
             </div>
         </div>
     </div>
+    <script>
+        $(function() {
+            $("#viewMode").buttonset();
+        });
+    </script>
+        <div id="viewMode" class="text-center">
+            <input type="radio" id="radio1" value="code" name="viewMode"  checked="checked" onchange="toggleViewMode(this.value);" /><label for="radio1">Code</label>
+            <input type="radio" id="radio2" value="chart"  name="viewMode" onchange="toggleViewMode(this.value);" /><label for="radio2">Graph</label>
+        </div>
 </div>
  
 <div id="design_canvas" ondrop="drop_window(event)" ondragover="allowDrop(event)">
 </div>
 
-<footer class="cmu_layout" id="cmu_footer">Powered by Team Virtual, 2013</footer>
-</body>
-</html></div>
- 
-<div id="design_canvas" ondrop="drop_window(event)" ondragover="allowDrop(event)">
-</div>
-
-<footer class="cmu_layout" id="cmu_footer">Powered by Team Virtual, 2013</footer>
 </body>
 </html>
