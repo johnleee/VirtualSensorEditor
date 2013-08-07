@@ -15,7 +15,7 @@ function calcGlobalControlDeviceValue_quarentine() {
             globalDeviceValue[deviceID] = {};
             setInterval(function () {
                 setupAjaxTimer(deviceID);
-            }, 3000);
+            }, 2000);
             break;
         }
     }
