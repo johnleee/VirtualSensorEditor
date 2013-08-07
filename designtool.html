@@ -15,16 +15,14 @@
     <script src="js/lib/modernizr.custom.98671.js"></script>
     <script src="js/lib/jquery.ui.position.js" type="text/javascript"></script>
     <script src="js/lib/jquery.contextMenu.js" type="text/javascript"></script>
+    <script src="js/lib/dvl.js" type="text/javascript"></script>
+    <script src="js/lib/d3.v2.js" type="text/javascript"></script>
     <script src="js/designtool_BLL.js"></script>
     <script src="js/designtool_WSL.js"></script>
     <script src="js/designtool_PRE.js"></script>
-    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
     <script type='text/javascript' src='js/lib/psMathStats.min.js'></script>
     <script type="text/javascript" src="http://www.jstat.org/js/jstat-1.0.0.min.js"></script>
-    <script src="http://www.flotcharts.org/flot/jquery.flot.js"></script>
-    <script type='text/javascript'>
-        //setTimeout(function(){google.load('visualization', '1', {'callback': function() { return true; }, 'packages':['corechart','gauge']})}, 10);
-    </script>
+    <!--script src="http://www.flotcharts.org/flot/jquery.flot.js"></script-->
     <script src="js/context-menu.js"></script>
 </head>
 <body data-demo-id="flowchartConnectorsDemo" data-library="jquery">
@@ -37,7 +35,7 @@
 	<nav>
 		<div class="menu">
 			<ul>
-				<li><a class="hide" id="help">HELP</a></li>
+				<li><a class="hide" id="help" href="help.html" target="_blank">HELP</a></li>
 				<li><a class="hide" href="http://clydeli.github.io/sn-visualization/dev" target="_blank">VISUALIZATION</a></li>
 				<li>
 					<a class="hide non-link">SPONSORS</a>
@@ -50,8 +48,8 @@
 				<li>
 					<a class="hide non-link">ABOUT US</a>
 					<ul>
-						<li><a href="http://www.cmu.edu/silicon-valley/faculty-staff/zhang-jia.html" target="_blank">FACULTY</a></li>
-						<li><a href="http://whiteboard.sv.cmu.edu/courses/256/teams/953" target="_blank">TEAM VIRTUAL</a></li>
+						<li><a href="faculty.html" target="_blank">FACULTY</a></li>
+						<li><a href="team.html" target="_blank">TEAM VIRTUAL</a></li>
 					</ul>
 				</li>	
 			</ul>
@@ -98,8 +96,8 @@
         <h4>VS templates</h4>
 
         <div id="virtual_sensors_templates">
-            <div draggable='true' ondragstart='drag(event)' rel="custom" id="template1" name="CUSTOM">
-                   <header>CUSTOM</header>
+            <div draggable='true' ondragstart='drag(event)' rel="custom" id="template1" name="FUNCTION">
+                   <header>FUNCTION</header>
             </div>
             <br/>
             <div draggable='true' ondragstart='drag(event)' rel="feeder" id="feeder" name="FEEDER">
@@ -112,6 +110,13 @@
         </div>
     </div>
 </div>
+ 
+<div id="design_canvas" ondrop="drop_window(event)" ondragover="allowDrop(event)">
+</div>
+
+<footer class="cmu_layout" id="cmu_footer">Powered by Team Virtual, 2013</footer>
+</body>
+</html></div>
  
 <div id="design_canvas" ondrop="drop_window(event)" ondragover="allowDrop(event)">
 </div>

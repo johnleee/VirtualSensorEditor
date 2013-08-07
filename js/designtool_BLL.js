@@ -41,14 +41,11 @@ function readSensorData(uuid, isInitialCall) {
             var deviceID = globalSensorInfo[uuid]["deviceID"];
             var sensorType = globalSensorInfo[uuid]["sensorType"];
             result = 0;
-            if (globalPhysicalSensorData[sensorType] != undefined) {
-
-                for (var i = 0; i < globalPhysicalSensorData[sensorType].length; i++) {
-                    if (globalPhysicalSensorData[sensorType][i]["device_id"] == deviceID) {
-                        result = globalPhysicalSensorData[sensorType][i]["value"];
-                        break;
-                    }
-                }
+            if (globalPhysicalSensorData[deviceID] != undefined) {
+                if (globalPhysicalSensorData[deviceID][sensorType]["value"] == undefined)
+                    result = 0;
+                else
+                    result = globalPhysicalSensorData[deviceID][sensorType]["value"];
             }
             if (result != 0 && sensorType == "digital_temp") {
                 result = (result * 9 / 50 + 32);
@@ -62,33 +59,57 @@ function readSensorData(uuid, isInitialCall) {
     if (isInitialCall) {
         switch (typeof result) {
             case "number":
-                result = result.toFixed(3);
+                result = parseFloat(result.toFixed(3));
                 break;
         }
     }
     return result;
 }
 
-
+/**
+ * Returns a string contains parameters values list for the user defined function.
+ * When the parameter is a string, its value need to add double quote. And when the
+ * parameter is a boolean, its value need to transfer as a Boolean class.
+ *
+ * @param  uuid unique universal ID of the sensor
+ * @return the string contains parameters values list
+ */
+function getParameterValues(uuid) {
+    var values = [];
+    for (var i = 0; i < globalSensorInfo[uuid]["children"].length; i++) {
+        var childUUID = globalSensorInfo[uuid]["children"][i];
+        var value = readSensorData(childUUID, false);
+        switch (typeof value) {
+            case "string": {
+                if (globalSensorInfo[childUUID]["category"] == "physical")
+                    values.push(value);
+                else
+                    values.push("\"" + value + "\"");
+                break;
+            }
+            case "boolean": {
+                values.push("new Boolean(" + value + ")");
+                break;
+            }
+            default:
+                values.push(value);
+        }
+    }
+    return values.join(",");
+}
 
 function readSensorStatus(uuid) {
     var status = "red";
     switch (globalSensorInfo[uuid]["category"]) {
         case "physical":
-
             var deviceID = globalSensorInfo[uuid]["deviceID"];
             var sensorType = globalSensorInfo[uuid]["sensorType"];
-            if (globalPhysicalSensorData[sensorType] != undefined) {
+            if (globalPhysicalSensorData[deviceID] != undefined) {
+                var lastTime = globalPhysicalSensorData[deviceID][sensorType]["timestamp"];
+                if (new Date().getTime() / 1000 - parseFloat(lastTime) < 15.0) {
+                    status = "black";
+                };
 
-                for (var i = 0; i < globalPhysicalSensorData[sensorType].length; i++) {
-                    if (globalPhysicalSensorData[sensorType][i]["device_id"] == deviceID) {
-                        var lastTime = globalPhysicalSensorData[sensorType][i]["timestamp"];
-                        if (new Date().getTime() / 1000 - parseFloat(lastTime) < 15.0) {
-                            status = "black";
-                            //console.log("time gap is: " + (new Date().getTime() / 1000 - parseFloat(lastTime)));
-                        };
-                    }
-                }
             }
             break;
         case "virtual":
@@ -122,40 +143,6 @@ function createUUID(prefix) {
     return uuid;
 }
 
-function readSensorValidity(uuid) {
-    var isValid = true;
-    switch (globalSensorInfo[uuid]["category"]) {
-        case "physical":
-        case "feeder":
-        case "virtual":
-            isValid = true;
-            break;
-        case "custom":
-            var sensorValue = [];
-            var argLabel = [];
-            for (var i = 0; i < globalSensorInfo[uuid]["children"].length; i++) {
-                if (!readSensorValidity(globalSensorInfo[uuid]["children"][i])) {
-                    isValid = false;
-                    break;
-                }
-                sensorValue.push(value);
-                argLabel.push(String.fromCharCode(65 + i));
-            }
-
-            var functionDeclaration = "var new_func=function(" + argLabel.join(",") + "){" + initializeInputType(uuid)
-                + globalSensorInfo[uuid]["expression"] + "}";
-            eval(functionDeclaration);
-            var temp;
-            var functionCallWithParams = "temp = new_func(" + sensorValue.join(",") + ");";
-            try {
-                eval(functionCallWithParams);
-            } catch (error) {
-                isValid = false;
-            }
-            break;
-    }
-    return isValid;
-}
 
 function saveVirtualSensor(editingMode) {
     var outputConnections = jsPlumb.getConnections({ target: 'output' });

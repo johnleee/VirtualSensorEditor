@@ -16,7 +16,21 @@ $(function() {
 				callback : function(key, options) {
 			        deleteElement(options.$trigger.get(0), true);
 			    }
-			}
+            },
+            "sep" : "---------",
+            "codeView" : {
+                name : "Code view",
+                callback : function(key, options) {
+                    codeView(options.$trigger.get(0), true);
+                }
+            },
+            "timeSeriesView" : {
+                name : "Time series view",
+                callback : function(key, options) {
+                    timeSeriesView(options.$trigger.get(0), true);
+                }
+            }
+
 		}
 	});
 

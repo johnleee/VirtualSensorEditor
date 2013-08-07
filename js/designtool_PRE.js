@@ -24,10 +24,11 @@ globalDeviceValue = {};
 //global sensor information
 globalSensorInfo = {};
 
+var globalSensorChartsInfo = new Array();
 
 
 //mapping between device id and human readable labels
-id_readable_mapping = {
+idReadableMapping = {
     "10170303":"B23_104",
     "10170302":"B23_105B",
     "10170006":"B23_107",
@@ -138,7 +139,7 @@ jsPlumb.bind("ready", function () {
         // the overlays to decorate each connection with.  note that the label overlay uses a function to generate the label text; in this
         // case it returns the 'labelText' member that we set on each connection in the 'init' method below.
         ConnectionOverlays:[
-            [ "Arrow", { location:0.5 } ]
+            [ "Arrow", { location:0.25 } ]
         ]
     });
 
@@ -297,21 +298,22 @@ function createNewVirtualSensorInCanvas(id, data) {
 }
 
 function createNewTemplateInCanvas(id, data) {
-    $('<div class="window" id="' + id + '" >').appendTo('#design_canvas');
-    $("#" + id).append("<span class='label label-template' id='label_" + id + "'>" + data.name + "_" + templates_counter++ + "</span><br/>");
-    if (typeof data.expression != 'undefined'){
+    if (typeof data.expression != 'undefined') {
         var expression = data.expression;
     }else{
         var expression = "";
     }
-
-    $("#" + id).append("function &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class='removeEndPoint' onclick='removeTargetEndpoint(this);'>  - </span>(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<span class='addEndPoint' onclick='addTargetEndpoint(this);'> + </span>{<br/><textarea class='code_textarea' id=textarea_" + id + " contenteditable='true'>" + expression + "</textarea><br/>}<br/>");
-    $("#" + id).append("<input type='button' value='Submit' name='" + id + "' onclick='setCustomFunction(\"" + id + "\");'  />");
-    $("#" + id).append("<div class='sensor_value' id='sensor_value_" + id + "' >0</div>");
-    $("#" + id).append("<input type='hidden' id='hidden_code_" + id + "' />");
-    $("#" + id).append("<input type='hidden' id='hidden_field_is_valid_" + id + "' value='false' />");
-    $("#" + id).append("<input type='hidden' id='hidden_field_status_sensor_value_" + id + "' />");
-    $("#" + id).append("<input type='hidden' id='hidden_field_uuid_" + id + "' value='" + createUUID("c") + "'/>");
+    $('<div class="window" id="' + id + '" >').appendTo('#design_canvas');
+    $("#" + id).append("<span class='label label-template' id='label_" + id + "'>" + data.name + "_" + templates_counter++ + "</span>"+
+    "&nbsp; <span class='removeEndPoint' onclick='removeTargetEndpoint(this);'>  - </span>(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<span class='addEndPoint' onclick='addTargetEndpoint(this);'> + </span><br/>" +
+    "<div id='vsFuncCont_" + id + "'><textarea class='code_textarea' id=textarea_" + id + " contenteditable='true'>" + expression + "</textarea><br/>"+
+    "<input type='button' class='btn' value='Set' name='" + id + "' onclick='setCustomFunction(\"" + id + "\");'  />"+
+    "&nbsp; &nbsp; &nbsp; <span class='sensor_value' style='display:inline-block; width:100px;' id='sensor_value_" + id + "' >0</span>"+
+    "<input type='hidden' id='hidden_code_" + id + "' />"+
+    "<input type='hidden' id='hidden_field_is_valid_" + id + "' value='false' />"+
+    "<input type='hidden' id='hidden_field_status_sensor_value_" + id + "' />"+
+    "<input type='hidden' id='hidden_field_uuid_" + id + "' value='" + createUUID("c") + "'/></div>"+
+    "<div class='vsChartContainer' id='vsChartCont_" + id  + "' >&nbsp</div>");
     jsPlumb.addEndpoint($("#" + id), sourceEndpoint);
 
     if (typeof data.children != 'undefined' && data.children.length > 1) {
@@ -323,12 +325,16 @@ function createNewTemplateInCanvas(id, data) {
     }
 
     globalSensorInfo[id] = {"category":"custom", name: data.name};
+    globalSensorChartsInfo[id] = dvl();
+    setupChart(id);
     var setIntervalId = setInterval(function () {
         if ($("#hidden_field_is_valid_" + id).val() === "false")
             return;
         $("#sensor_value_" + id).css("color", readSensorStatus(id));
-        $("#sensor_value_" + id).html(readSensorData(id, true));
-    }, 1000);
+        var temp = readSensorData(id, true);
+        $("#sensor_value_" + id).html(temp);
+        globalSensorChartsInfo[id].value(temp);
+    }, 2000);
 
     globalSensorInfo[id]["setIntervalId"] = setIntervalId;
 }
@@ -336,15 +342,15 @@ function createNewTemplateInCanvas(id, data) {
 function createNewFeederInCanvas(id, data) {
     $('<div class="window" id="' + id + '" >').appendTo('#design_canvas');
     var name = "FEEDER_" + feederCounter++;
-    $("#" + id).append("<div class='label' id='label_" + id + "'>" + name + "</div><br/>");
+    $("#" + id).append("<div class='label' id='label_" + id + "'>" + name + "</div>");
     if (typeof data.inputvalue != 'undefined'){
        var inputvalue = data.inputvalue;
     }else{
        var inputvalue = "0";
     }
-    $("#" + id).append("<input type='text' value='" + inputvalue + "' id='feeder_value_" + id + "' />");
-    $("#" + id).append("<input type='button' value='Submit' name='" + id + "' onclick='setFeederValue(\"" + id + "\")'  />");
-    $("#" + id).append("<div class='sensor_value' id='sensor_value_" + id + "' name='" + id + "' onclick='feederLabelClick(\"" + id + "\")'>0</div>");
+    $("#" + id).append("<br/><input type='text' style='width: 80px;margin-bottom: 4px;' value='" + inputvalue + "' id='feeder_value_" + id + "' /> &nbsp;");
+    $("#" + id).append("<input type='button' class='btn' style='margin-bottom: 4px;' value='Set' name='" + id + "' onclick='setFeederValue(\"" + id + "\")'  /><br/>");
+    $("#" + id).append("<div class='sensor_value'  id='sensor_value_" + id + "' name='" + id + "' onclick='feederLabelClick(\"" + id + "\")'>0</div>");
     $("#" + id).append("<input type='hidden' id='hidden_field_status_sensor_value_" + id + "' value='red' />");
 
     globalSensorInfo[id] = { "category":"feeder", "status":"red", "inputvalue":inputvalue};
@@ -354,9 +360,8 @@ function createNewFeederInCanvas(id, data) {
 function createNewMonitorInCanvas(id, data) {
     $('<div class="window" id="' + id + '" >').appendTo('#design_canvas');
     var name = "Status Monitor";
-    $("#" + id).append("<div class='label' id='label_" + id + "'>" + name + "</div><br/>");
-    $("#" + id).append("<div class='siren_image' id='image_" + id + "' hidden='true'><img src='img/red_siren.gif'></img></div>");
-
+    $("#" + id).append("<div class='label' id='label_" + id + "'>" + name + "</div>");
+    $("#" + id).append("<div class='siren_image' id='image_" + id + "' hidden='true'><img src='img/red_siren.gif'></div><br/>");
     $("#" + id).append("<input type='button' value='Enabled' id='monitor_button_" + id + "' onclick='monitorClick(\"" + id + "\");'  />");
     $("#" + id).append("<input type='hidden' id='hidden_field_status_" + id + "' value='on' />");
     $("#" + id).append("<audio src='audio/siren.mp3' id='audio_" + id + "' loop='loop'></audio>");
@@ -451,7 +456,7 @@ initPhysicalSensor();
 
 $.get(hostname + "/last_readings_from_all_devices/1374158197000/digital_temp/json", function (data) {
     $('#temp').html('');
-    $.each(id_readable_mapping, function (key, val) {
+    $.each(idReadableMapping, function (key, val) {
         var tmp = val.split("_");
         var str_name = tmp[0] + "RM" + tmp[1];
         var str_temp = "<div draggable='true' ondragstart='drag(event)' rel='digital_temp' id=" + key + " name='" + str_name + "TEMP'><header>" + val + "</header></div>";
@@ -537,8 +542,8 @@ function calculateEndpointPosition(endpointArray) {
     var div = (endpointArray.length + 1);
 
     for (var i = 0; i < endpointArray.length; i++) {
-        endpointArray[i].anchor.x = 0.23 + ((i + 1) / div) * 0.7;
-        endpointArray[i].anchor.y = 0.10;
+        endpointArray[i].anchor.x = 0.31 + ((i + 1) / div) * 0.65;
+        endpointArray[i].anchor.y = 0;
     }
 }
 
@@ -553,10 +558,10 @@ function addTargetEndpoint(obj, isParent) {
     if (targetEndpoints.length < 7) {
         var ep = jsPlumb.addEndpoint(parentnode, targetEndpoint);
         var varName = String.fromCharCode(65 + targetEndpoints.length);
-        ep.addOverlay([ "Label", { location:[0.5, 1.5], label:varName, cssClass:"endpointTargetLabel" } ]);
+        ep.addOverlay([ "Label", { location:[0.5, 1.8], label:varName, cssClass:"endpointTargetLabel" } ]);
         fixEndpoints(parentnode);
     } else {
-        alert("You can not add more than 10 input variables");
+        alert("You can not add more than 7 input variables");
     }
 }
 
@@ -618,37 +623,192 @@ function getEndPointsOfElement(element, typeEndPoint) {
 }
 
 
-/**
- * Returns a string contains parameters values list for the user defined function. 
- * When the parameter is a string, its value need to add double quote. And when the 
- * parameter is a boolean, its value need to transfer as a Boolean class.
- * 
- * @param  uuid unique universal ID of the sensor
- * @return the string contains parameters values list
-*/
-function getParameterValues(uuid) {
-	var values = [];
-	for (var i = 0; i < globalSensorInfo[uuid]["children"].length; i++) {
-		var childUUID = globalSensorInfo[uuid]["children"][i];
-		var value = readSensorData(childUUID, false);
-		switch (typeof value) {
-			case "string": {
-				if (globalSensorInfo[childUUID]["category"] == "physical") 
-					values.push(value);
-				else
-					values.push("\"" + value + "\"");
-				break;
-			}
-			case "boolean": {
-				values.push("new Boolean(" + value + ")");
-				break;
-			}
-			default:
-				values.push(value);
-		}		
-	}
-	return values.join(",");
+
+
+function setupChart(id){
+    var data = dvl.recorder({
+        data:globalSensorChartsInfo[id],
+        value:'value',
+        timestamp:'time',
+        max:150
+    })
+
+    var getX = dvl.acc('time');
+    var getY = dvl.acc('value');
+    var margin = { top:5, bottom:20, left:0, right:23 };
+    var width = dvl(275);
+    var height = dvl(195);
+    var innerWidth = dvl.op.sub(width, margin.left, margin.right);
+    var innerHeight = dvl.op.sub(height, margin.top, margin.bottom);
+    var transition = { duration:300 }
+
+    var svg = dvl.bind({
+        parent:d3.select('#vsChartCont_'+ id),
+        self:'svg',
+        attr:{
+            width:width,
+            height:height
+        }
+    });
+
+    var offsetGroup = dvl.bind({
+        parent:svg,
+        self:'g.offset',
+        attr:{
+            transform:'translate(' + margin.left + ',' + margin.top + ')'
+        }
+    });
+
+    var clipPathId = dvl.svg.clipPath({
+        parent:offsetGroup,
+        width:innerWidth,
+        height:innerHeight
+    });
+
+    var vis = dvl.bind({
+        parent:offsetGroup,
+        self:'g.vis',
+        attr:{
+            'clip-path':clipPathId
+        }
+    });
+
+    var visTicks = dvl.bind({
+        parent:offsetGroup,
+        self:'g.ticks'
+    });
+
+    dvl.bind({
+        parent:vis,
+        self:'rect.background',
+        attr:{
+            width:innerWidth,
+            height:innerHeight
+        }
+    });
+
+    var sx = dvl.apply(
+        [data, innerWidth, getX],
+        function (data, width, fn) {
+            if (!data.length) return null
+            return d3.time.scale()
+                .domain([fn(data[0]), fn(data[data.length - 1])])
+                .range([0, width])
+        }
+    );
+    var sxTicks = sx.apply(function (d) {
+        //return d.ticks(7)
+        return d.ticks(d3.time.minutes, 1)
+    });
+    var sxTickFormat = sx.apply(function (d) {
+        //return d.tickFormat(7)
+        return d.tickFormat(d3.time.minutes)
+    });
+
+    var sy = dvl.apply(
+        [data, innerHeight, getY],
+        function (data, height, fn) {
+            if (!data.length) return null;
+            return d3.scale.linear()
+                .domain([d3.min(data, fn)*0.985, d3.max(data, fn)*1.015])
+                .range([height, 0])
+        }
+    );
+    var syTicks = sy.apply(function (d) {
+        return d.ticks(10)
+    });
+    var syTickFormat = sy.apply(function (d) {
+        return d.tickFormat(10)
+    });
+
+    dvl.bind({
+        parent:vis,
+        self:'line.x-ticks',
+        data:sxTicks,
+        join:String,
+        attr:{
+            x1:sx,
+            y1:0,
+            x2:sx,
+            y2:innerHeight
+        },
+        transition:transition
+    });
+
+    dvl.bind({
+        parent:visTicks,
+        self:'text.x-ticks',
+        data:sxTicks,
+        join:String,
+        attr:{
+            x:sx,
+            y:innerHeight,
+            dy:'1.2em'
+        },
+        text:sxTickFormat,
+        transition:transition
+    });
+
+    dvl.bind({
+        parent:vis,
+        self:'line.y-ticks',
+        data:syTicks,
+        join:String,
+        attr:{
+            x1:0,
+            y1:sy,
+            x2:innerWidth,
+            y2:sy
+        },
+        transition:transition
+    });
+
+    dvl.bind({
+        parent:visTicks,
+        self:'text.y-ticks',
+        data:syTicks,
+        join:String,
+        attr:{
+            x:innerWidth,
+            y:sy,
+            dx:'4px',
+            dy:'.35em'
+        },
+        text:syTickFormat,
+        transition:transition
+    });
+
+    var lineFn = dvl.apply(
+        [sx, getX, sy, getY],
+        function (sx, ax, sy, ay) {
+            return d3.svg.line()
+                .interpolate("basis")
+                .x(function (d) {
+                    return sx(ax(d));
+                })
+                .y(function (d) {
+                    return sy(ay(d));
+                })
+        }
+    );
+
+    dvl.bind({
+        parent:vis,
+        self:'path.dvl',
+        data:dvl.op.list(data),
+        attr:{
+            d:lineFn
+        },
+        transition:transition
+    });
 }
 
+function codeView(elem, askConfirmation) {
+    $('#vsFuncCont_'+elem.id).css('visibility','visible');
+    $('#vsChartCont_'+elem.id).css('visibility','hidden');
+}
 
-
+function timeSeriesView(elem, askConfirmation) {
+    $('#vsFuncCont_'+elem.id).css('visibility','hidden');
+    $('#vsChartCont_'+elem.id).css('visibility','visible');
+}
