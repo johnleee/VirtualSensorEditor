@@ -479,48 +479,45 @@ function setCustomFunction(id) {
 //give globalPhysicalSensor initial value
 initPhysicalSensor();
 
-$.get(hostname + "/last_readings_from_all_devices/1374158197000/digital_temp/json", function (data) {
-    $('#temp').html('');
-    $.each(idReadableMapping, function (key, val) {
-        var tmp = val.split("_");
-        var str_name = tmp[0] + "RM" + tmp[1];
-        var str_temp = "<div draggable='true' ondragstart='drag(event)' rel='digital_temp' id=" + key + " name='" + str_name + "TEMP'><header>" + val + "</header></div>";
-        $('#temp').append(str_temp + '<br/>');
+$('#temp').html('');
+$.each(idReadableMapping, function (key, val) {
+    var tmp = val.split("_");
+    var str_name = tmp[0] + "RM" + tmp[1];
+    var str_temp = "<div draggable='true' ondragstart='drag(event)' rel='digital_temp' id=" + key + " name='" + str_name + "TEMP'><header>" + val + "</header></div>";
+    $('#temp').append(str_temp + '<br/>');
 
-        var str_light = "<div draggable='true' ondragstart='drag(event)' rel='light' id=" + key + " name='" + str_name + "LHT'><header>" + val + "</header></div>";
-        $('#light').append(str_light + '<br/>');
+    var str_light = "<div draggable='true' ondragstart='drag(event)' rel='light' id=" + key + " name='" + str_name + "LHT'><header>" + val + "</header></div>";
+    $('#light').append(str_light + '<br/>');
 
-        var str_humidity = "<div draggable='true' ondragstart='drag(event)' rel='humidity' id=" + key + " name='" + str_name + "HUM'><header>" + val + "</header></div>";
-        $('#humidity').append(str_humidity + '<br/>');
+    var str_humidity = "<div draggable='true' ondragstart='drag(event)' rel='humidity' id=" + key + " name='" + str_name + "HUM'><header>" + val + "</header></div>";
+    $('#humidity').append(str_humidity + '<br/>');
 
-        var str_audio_p2p = "<div draggable='true' ondragstart='drag(event)' rel='audio_p2p' id=" + key + " name='" + str_name + "SND'><header>" + val + "</header></div>";
-        $('#sound_level').append(str_audio_p2p + '<br/>');
+    var str_audio_p2p = "<div draggable='true' ondragstart='drag(event)' rel='audio_p2p' id=" + key + " name='" + str_name + "SND'><header>" + val + "</header></div>";
+    $('#sound_level').append(str_audio_p2p + '<br/>');
 
-        var str_motion = "<div draggable='true' ondragstart='drag(event)' rel='motion' id=" + key + " name='" + str_name + "MOT'><header>" + val + "</header></div>";
-        $('#motion').append(str_motion + '<br/>');
-    });
-
-    setInterval(function () {
-        sensorTimer("digital_temp");
-    }, 3000);
-
-    setInterval(function () {
-        sensorTimer("light");
-    }, 3000);
-
-    setInterval(function () {
-        sensorTimer("humidity");
-    }, 3000);
-
-    setInterval(function () {
-        sensorTimer("audio_p2p");
-    }, 3000);
-
-    setInterval(function () {
-        sensorTimer("motion");
-    }, 3000);
-
+    var str_motion = "<div draggable='true' ondragstart='drag(event)' rel='motion' id=" + key + " name='" + str_name + "MOT'><header>" + val + "</header></div>";
+    $('#motion').append(str_motion + '<br/>');
 });
+
+setInterval(function () {
+    sensorTimer("digital_temp");
+}, 3000);
+
+setInterval(function () {
+    sensorTimer("light");
+}, 3000);
+
+setInterval(function () {
+    sensorTimer("humidity");
+}, 3000);
+
+setInterval(function () {
+    sensorTimer("audio_p2p");
+}, 3000);
+
+setInterval(function () {
+    sensorTimer("motion");
+}, 3000);
 
 function allowDrop(ev) {
     ev.preventDefault();
