@@ -377,6 +377,12 @@ function createNewAlgorithmInCanvas (id, data) {
         return sum + x;
       }, 0);
       return sum / args.length;
+    },
+    MAX: function (args) {
+      return Math.max.apply(Math, args);
+    },
+    MIN: function (args) {
+      return Math.min.apply(Math, args);
     }
   };
   var expr = 'var args = [].slice.call(arguments); return (' + expressions[name].toString() + ')(args);';
