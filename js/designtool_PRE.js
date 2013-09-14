@@ -160,7 +160,7 @@ jsPlumb.bind("ready", function () {
 
     //jQuery UI for the accordion
     $(function () {
-        $("#accordion").accordion({autoHeight:true, collapsible:false});
+        $("#accordion").accordion({autoHeight:true, collapsible:true});
 
     });
 
