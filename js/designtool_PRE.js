@@ -176,6 +176,9 @@ function createNewElementInCanvas(type, x, y, data, uuid) {
     }
 
     switch (type) {
+        case 'algorithm':
+            createNewAlgorithmInCanvas(id, data);
+            break;
         case 'custom':
             createNewTemplateInCanvas(id, data);
             break;
@@ -364,6 +367,22 @@ function createNewTemplateInCanvas(id, data) {
     globalSensorInfo[id]["setIntervalId"] = setIntervalId;
 }
 
+function createNewAlgorithmInCanvas (id, data) {
+  createNewTemplateInCanvas(id, data);
+  var $textarea = $('#textarea_' + id);
+  var name = data.name;
+  var expressions = {
+    AVERAGE: function (args) {
+      var sum = args.reduce(function (sum, x) {
+        return sum + x;
+      }, 0);
+      return sum / args.length;
+    }
+  };
+  var expr = 'var args = [].slice.call(arguments); return (' + expressions[name].toString() + ')(args);';
+  $textarea.val(expr).hide();
+}
+
 function createNewFeederInCanvas(id, data) {
     $('<div class="window" id="' + id + '" >').appendTo('#design_canvas');
     var name = "FEEDER_" + feederCounter++;
@@ -540,10 +559,10 @@ function drop_window(ev) {
     var name = str[2];
     var deviceID = str[0];
 
-    if (category === "template" || category === "virtual" || category === "feeder" || category==="monitor") {
+    if (category === "template" || category === "virtual" || category === "feeder" || category==="monitor" ||
+        category === 'algorithm') {
         createNewElementInCanvas(category, ev.clientX, ev.clientY, {name:name});
-    }
-    else {
+    } else {
         if (deviceID) {
             createNewElementInCanvas(category, ev.clientX, ev.clientY, { deviceID:deviceID, sensorType:category, name:name });
         }
