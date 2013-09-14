@@ -1,5 +1,7 @@
 ﻿/// <reference path="designtool_PRE.js" />
 
+var USE_FAKE_DATA = true;
+
 function setupAjaxTimer_quarentine(deviceId) {
     var lastTime = last_reading_time_for_all_devices[deviceId];
 
@@ -33,7 +35,14 @@ function initPhysicalSensor() {
 }
 
 function sensorTimer(sensorType) {
-    //http://cmu-sensor-network.herokuapp.com/lastest_readings_from_all_devices/temp
+
+    if (USE_FAKE_DATA) {
+      for (var deviceID in globalPhysicalSensorData) {
+        globalPhysicalSensorData[deviceID][sensorType]["value"] = Math.random() * 100;
+        globalPhysicalSensorData[deviceID][sensorType]["timestamp"] = '' + Date.now();
+      }
+      return;
+    }
 
     var urlString = hostname + "/lastest_readings_from_all_devices/" + sensorType + "/json";
     $.get(urlString, function (newData) {
