@@ -1,6 +1,6 @@
 ﻿/// <reference path="designtool_PRE.js" />
 
-var USE_FAKE_DATA = true;
+var USE_FAKE_DATA = false;
 
 function setupAjaxTimer_quarentine(deviceId) {
     var lastTime = last_reading_time_for_all_devices[deviceId];

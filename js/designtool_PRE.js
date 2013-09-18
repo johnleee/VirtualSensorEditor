@@ -1,6 +1,7 @@
 //hostname = "http://tool.azurewebsites.net/Default.aspx"
 //hostname = "http://cmu-sds.herokuapp.com"
-hostname = "http://cmu-sensor-network.herokuapp.com";
+//hostname = "http://cmu-sensor-network.herokuapp.com";
+hostname = 'http://einstein.sv.cmu.edu';
 
 //latest global sensor data
 globalPhysicalSensorData = {};
