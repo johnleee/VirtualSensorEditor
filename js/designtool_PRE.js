@@ -3,6 +3,7 @@
 //hostname = "http://cmu-sensor-network.herokuapp.com";
 hostname = 'http://einstein.sv.cmu.edu';
 
+
 //latest global sensor data
 globalPhysicalSensorData = {};
 
@@ -934,3 +935,12 @@ function startIntro(){
 
     intro.start();
 }
+
+function bindToggleEvent() {
+    $('#data-source-toggle').click(function () {
+        using_fake_data = !using_fake_data;
+        $(this).text(using_fake_data ? 'TEST' : 'PROD');
+    });
+}
+
+bindToggleEvent();

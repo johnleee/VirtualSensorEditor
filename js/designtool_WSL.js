@@ -1,6 +1,7 @@
 ﻿/// <reference path="designtool_PRE.js" />
 
-var USE_FAKE_DATA = false;
+var using_fake_data = false;
+
 
 function setupAjaxTimer_quarentine(deviceId) {
     var lastTime = last_reading_time_for_all_devices[deviceId];
@@ -36,7 +37,7 @@ function initPhysicalSensor() {
 
 function sensorTimer(sensorType) {
 
-    if (USE_FAKE_DATA) {
+    if (using_fake_data) {
       for (var deviceID in globalPhysicalSensorData) {
         globalPhysicalSensorData[deviceID][sensorType]["value"] = Math.random() * 100;
         globalPhysicalSensorData[deviceID][sensorType]["timestamp"] = '' + Date.now();
