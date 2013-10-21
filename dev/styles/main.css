@@ -82,7 +82,7 @@ body {
   border: 1px solid #111;
 	background-color: #666;
 }
-.nodeBlock.goodBlock { background-color: steelBlue; }
+.nodeBlock.goodBlock { background-color: green; }
 .nodeBlock.avgBlock { background-color: khaki; }
 .nodeBlock.badBlock { background-color: red; }
 

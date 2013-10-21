@@ -385,6 +385,55 @@ function createNewAlgorithmInCanvas (id, data) {
     },
     MIN: function (args) {
       return Math.min.apply(Math, args);
+    },
+    CO2: function (args) {
+      /*
+      private static double pep;
+      private static double transient_pep;
+      private static double steady_pep; 
+      private static double V; //the space air volume,ft^3
+      private static double N; //the space CO2 concentration at the present time step, ppm
+      private static double N_back; //the space CO2 concentration one time step back, ppm
+      private static double time_step; //the time step, min
+      private static double SA; //the supply airflow rate, scfm
+      private static double Ci; //the CO2 concentration in the supply air, ppn
+      private static double G; // the CO2 generation rate per person, scfm
+
+      public static void inputdata_initial(double air_space, double present_CO2, double timeback_CO2,double time_step_min, double supply_airflow_rate, double supply_air_CO2, double generation_CO2){
+        V = air_space;
+        N = present_CO2;
+        N_back = timeback_CO2;
+        time_step = time_step_min;
+        SA = supply_airflow_rate;
+        Ci = supply_air_CO2;
+        G = generation_CO2;
+      }
+      
+      public static void transient_term()
+      {
+        transient_pep = V * (N - N_back) / (time_step* G * 1000000);
+      }
+      
+      public static void steady_term()
+      {
+        steady_pep = SA * (N - Ci)/(G * 1000000);
+      }
+      
+      public static void compute_occupancy(){
+        //pep = (V * (N - N_back) / time_step + SA * (N - Ci))/(G * 1000000);
+        pep = transient_pep + steady_pep;
+      }  
+      */
+      var V = args[0]         ; // air_space
+      var N = args[1]         ; // present_CO2
+      var N_back = args[2]    ; // timeback_CO2
+      var time_step = args[3] ; // time_step_min
+      var SA = args[4]        ; // supply_airflow_rate
+      var Ci = args[5]        ; // supply_airflow_CO2
+      var G = args[6]         ; // genereation_CO2
+
+      return V * (N - N_back) / (time_step* G * 1000000) +
+        SA * (N - Ci)/(G * 1000000);
     }
   };
   var expr = 'var args = [].slice.call(arguments); return (' + expressions[name].toString() + ')(args);';
