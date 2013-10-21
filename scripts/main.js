@@ -1,3 +1,4 @@
+var hostname = 'http://einstein.sv.cmu.edu';
 var sn_visualization = sn_visualization || {};
 
 sn_visualization.main = (function(){
@@ -52,14 +53,14 @@ sn_visualization.main = (function(){
       );
       pollingWorker.postMessage({
         type: "START",
-        url: "http://cmu-sds.herokuapp.com/get_last_reading_time_for_all_devices",
+        url: "http://einstein.sv.cmu.edu/last_readings_from_all_devices/1368568896000/temp/json",
       });
     },
 		buildSensorsObj = function(callback){
 			var snArch = { id : "root", name : "CMUSV", children : [] };
 			var gatewayHash = {};
 
-			$.getJSON("http://cmu-sds.herokuapp.com/get_devices", function(data){
+			$.getJSON(hostname + "/get_devices", function(data){
 				console.log(data);
 
 				/* Parse the data */
