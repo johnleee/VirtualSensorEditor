@@ -137,7 +137,27 @@
             <input type="radio" id="radio2" value="chart"  name="viewMode" onchange="toggleViewMode(this.value);" /><label for="radio2">Graph</label>
         </div>
 </div>
- 
+
+<div style="height:40px;text-align:right;">
+From
+    <input type="text" name="date_from" id="date_from" style="margin:5px;" />
+    <input type="hidden" name="date_from_alternate" id="date_from_alternate" />
+To
+    <input type="text" name="date_to" id="date_to" style="margin:5px;" />
+    <input type="hidden" name="date_to_alternate" id="date_to_alternate" />
+</div>
+<script>
+$(document).ready(function () {
+    $( "#date_from" ).datepicker({
+      altField: "#date_from_alternate",
+      altFormat: "@"
+    });
+    $( "#date_to" ).datepicker({
+      altField: "#date_to_alternate",
+      altFormat: "@"
+    });
+});
+</script>
 <div id="design_canvas" ondrop="drop_window(event)" ondragover="allowDrop(event)">
 </div>
     <script src="js/designtool_BLL.js"></script>
