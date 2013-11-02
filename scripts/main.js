@@ -60,14 +60,15 @@ sn_visualization.main = (function(){
 			var snArch = { id : "root", name : "CMUSV", children : [] };
 			var gatewayHash = {};
 
-			$.getJSON(hostname + "/get_devices", function(data){
-				console.log(data);
+			$.getJSON(hostname + "/get_devices/json", function(data){
 
 				/* Parse the data */
 				var deviceCount = data.length;
 				for(var i=0; i< deviceCount; ++i){
 
-					var gatewayName = data[i].device_agent[0].print_name;
+                    console.log(data);
+
+					var gatewayName = data[i].device_agent;
 					if(!gatewayHash.hasOwnProperty(gatewayName)){
 						snArch.children.push({ type: "Gateway", id: "gateway"+String(i), name: gatewayName, data: {}, children: [] });
 						gatewayHash[gatewayName] = snArch.children.length-1;
@@ -75,19 +76,26 @@ sn_visualization.main = (function(){
 
 					var deviceNode = {
 						type : "Device", d_uri : data[i].uri,
-						name : data[i].location.print_name,
+						name : data[i].device_location,
 						data : {}, children : []
 					};
 
-					var sensorCount = data[i].sensors.length;
-					for(var j=0; j<sensorCount; ++j){
-						for( var key in data[i].sensors[j]){
-							deviceNode.children.push({
-								type : "Sensor", d_uri : data[i].uri, s_id : key, d_name : data[i].location.print_name, name : data[i].sensors[j][key],
-								data : {}, children : []
-							});
-						}
-					}
+                    var deviceType = data[i].device_type
+
+                    $.ajax({
+                        url: hostname + "/get_sensor_types/" + deviceType + "/json",
+                        dataType: 'json',
+                        async: false,
+                        success: function(data) {
+                            var allSensors = data.sensor_type;
+                            var sensorArray = allSensors.split(',');
+                            var sensorCount = sensorArray.length;
+
+                            $.each(sensorArray, function(index){
+                                deviceNode.children.push({ type : "Sensor", d_uri : deviceNode.d_uri, s_id : 0, d_name : deviceNode.name, name : sensorArray[index], data : {}, children : [] });
+                            });
+                        }
+                    });
 
 					snArch.children[ gatewayHash[gatewayName]].children.push(deviceNode);
 				}
@@ -107,7 +115,7 @@ sn_visualization.main = (function(){
 
 		initialize : function(){
 			buildSensorsObj(sn_visualization.topologicalView.initialize);
-      pollingSensorStatus();
+//      pollingSensorStatus();
 		}
 	};
 
