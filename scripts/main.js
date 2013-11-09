@@ -58,13 +58,14 @@ sn_visualization.main = (function () {
             );
             pollingWorker.postMessage({
                 type: "START",
-                url: "http://einstein.sv.cmu.edu/last_readings_from_all_devices/1368568896000/temp/json"
+                url: "http://einstein.sv.cmu.edu/last_readings_from_all_devices/1384023018000/temp/json"
             });
         },
     //        Build d3 tree root > Gateway (SensorAndrew0 etc.) > Device (B...) > Sensors (temp, light etc.)
         buildSensorsObj = function (callback) {
             var snArch = { id: "root", name: "CMUSV", children: [] };
             var gatewayHash = {};
+            var deviceTypeSensorsMap = {};
 
             $.getJSON(hostname + "/get_devices/json", function (data) {
 
@@ -72,9 +73,10 @@ sn_visualization.main = (function () {
                 var deviceCount = data.length;
                 for (var i = 0; i < deviceCount; ++i) {
 
-                    console.log(data);
-
                     var gatewayName = data[i].device_agent;
+                    if (gatewayName == undefined || !gatewayName.match("^SensorAndrew")) {
+                        continue
+                    }
                     if (!gatewayHash.hasOwnProperty(gatewayName)) {
                         snArch.children.push({ type: "Gateway", id: "gateway" + String(i), name: gatewayName, data: {}, children: [] });
                         gatewayHash[gatewayName] = snArch.children.length - 1;
@@ -86,21 +88,28 @@ sn_visualization.main = (function () {
                         data: {}, children: []
                     };
 
-                    var deviceType = data[i].device_type
+                    var deviceType = data[i].device_type;
 
-                    $.ajax({
-                        url: hostname + "/get_sensor_types/" + deviceType + "/json",
-                        dataType: 'json',
-                        async: false,
-                        success: function (data) {
-                            var allSensors = data.sensor_type;
-                            var sensorArray = allSensors.split(',');
-                            var sensorCount = sensorArray.length;
-                            $.each(sensorArray, function (index) {
-                                deviceNode.children.push({ type: "Sensor", d_uri: deviceNode.d_uri, s_id: 0, d_name: deviceNode.name, name: sensorArray[index], data: {}, children: [] });
-                            });
-                        }
-                    });
+                    if (deviceType in deviceTypeSensorsMap) {
+                        deviceNode.children.push(deviceTypeSensorsMap[deviceType]);
+
+                    }
+                    else {
+                        $.ajax({
+                            url: hostname + "/get_sensor_types/" + deviceType + "/json",
+                            dataType: 'json',
+                            async: false,
+                            success: function (data) {
+                                var allSensors = data.sensor_type;
+                                var sensorArray = allSensors.split(',');
+                                $.each(sensorArray, function (index) {
+                                    deviceNode.children.push({ type: "Sensor", d_uri: deviceNode.d_uri, s_id: 0, d_name: deviceNode.name, name: sensorArray[index], data: {}, children: [] });
+                                    deviceTypeSensorsMap[deviceType] =  { type: "Sensor", d_uri: deviceNode.d_uri, s_id: 0, d_name: deviceNode.name, name: sensorArray[index], data: {}, children: [] }
+                                });
+                            }
+                        });
+                    }
+
 
                     snArch.children[ gatewayHash[gatewayName]].children.push(deviceNode);
                 }
@@ -124,7 +133,7 @@ sn_visualization.main = (function () {
 
         initialize: function () {
             buildSensorsObj(sn_visualization.topologicalView.initialize);
-            pollingSensorStatus();
+//            pollingSensorStatus();
         }
     };
 
