@@ -207,6 +207,8 @@ function saveElementAndChildren(id) {
 function persistToLocalStorage() {
     if (Modernizr.localstorage) {
         localStorage["storageObj"] = JSON.stringify(storageObj);
+        var x2js = new X2JS();
+        localStorage["storageObjXml"] = x2js.json2xml_str(storageObj);
     }
 
     //send to node.js
