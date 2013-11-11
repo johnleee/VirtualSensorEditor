@@ -1,5 +1,13 @@
 var hostname = 'http://einstein.sv.cmu.edu';
 var sn_visualization = sn_visualization || {};
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
 
 sn_visualization.main = (function () {
 
@@ -9,56 +17,64 @@ sn_visualization.main = (function () {
             pollingWorker = new Worker('scripts/workers/floorViewWorker.js');
             pollingWorker.addEventListener(
                 'message', function (e) {
-                    var data = JSON.parse(e.data);
-                    console.log(data);
 
-                    // Update data in topologicalView and floorView
-                    sn_visualization.topologicalView.updateStatus(data);
-                    sn_visualization.floorViews.getView("cmusvFloors").updateDeviceStatus(data);
+                    if (!IsJsonString(e.data)) {
+                        console.log(e.data);
+                    }
+                    else {
+                        var data = JSON.parse(e.data);
 
-                    // Update data in dashboardView
-                    var now = new Date();
 
-                    for (var key in data) {
-                        var
-                            offset = now.getTime() - data[key] * 1000,
-                            targetCard = $('#dashboardView .deviceCard[data-d_uri=' + key + ']');
+                        // Update data in topologicalView and floorView
+                        sn_visualization.topologicalView.updateStatus(data);
+                        sn_visualization.floorViews.getView("cmusvFloors").updateDeviceStatus(data);
 
-                        if (targetCard.length == 0) {
-                            var cardHTML =
-                                '<div class="deviceCard" data-d_uri="' + key + '">' +
-                                    key +
-                                    '</div>';
-                            $('#dashboardView').append(cardHTML);
-                            targetCard = $('#dashboardView .deviceCard[data-d_uri=' + key + ']');
+                        // Update data in dashboardView
+                        var now = new Date();
+
+                        for (var key in data) {
+                            var
+                                offset = now.getTime() - data[key] * 1000,
+                                targetCard = $('#dashboardView .deviceCard[data-d_uri=' + key + ']');
+
+                            if (targetCard.length == 0) {
+                                var cardHTML =
+                                    '<div class="deviceCard" data-d_uri="' + key + '">' +
+                                        key +
+                                        '</div>';
+                                $('#dashboardView').append(cardHTML);
+                                targetCard = $('#dashboardView .deviceCard[data-d_uri=' + key + ']');
+                            }
+
+                            targetCard.removeClass('badBlock avgBlock goodBlock');
+                            if (offset > 3 * 60 * 1000) {
+                                targetCard.addClass('badBlock');
+                            }
+                            else if (offset > 15 * 1000) {
+                                targetCard.addClass('avgBlock');
+                            }
+                            else {
+                                targetCard.addClass('goodBlock');
+                            }
                         }
 
-                        targetCard.removeClass('badBlock avgBlock goodBlock');
-                        if (offset > 3 * 60 * 1000) {
-                            targetCard.addClass('badBlock');
+                        // Log received data into logView
+                        $('#logView').append('Update received for device status at ' + (new Date()) + '<br>');
+                        var logText = '{';
+                        for (var key2 in data) {
+                            logText += key2 + ' : ' + data[key2] + ' ';
                         }
-                        else if (offset > 15 * 1000) {
-                            targetCard.addClass('avgBlock');
-                        }
-                        else {
-                            targetCard.addClass('goodBlock');
-                        }
+                        logText += '}<br>';
+                        $('#logView').append(logText);
                     }
 
-                    // Log received data into logView
-                    $('#logView').append('Update received for device status at ' + (new Date()) + '<br>');
-                    var logText = '{';
-                    for (var key2 in data) {
-                        logText += key2 + ' : ' + data[key2] + ' ';
-                    }
-                    logText += '}<br>';
-                    $('#logView').append(logText);
+
 
                 }, false
             );
             pollingWorker.postMessage({
                 type: "START",
-                url: "http://einstein.sv.cmu.edu/last_readings_from_all_devices/1384023018000/temp/json"
+                url: "http://einstein.sv.cmu.edu/last_readings_from_all_devices/"
             });
         },
     //        Build d3 tree root > Gateway (SensorAndrew0 etc.) > Device (B...) > Sensors (temp, light etc.)
@@ -133,7 +149,7 @@ sn_visualization.main = (function () {
 
         initialize: function () {
             buildSensorsObj(sn_visualization.topologicalView.initialize);
-//            pollingSensorStatus();
+            pollingSensorStatus();
         }
     };
 
