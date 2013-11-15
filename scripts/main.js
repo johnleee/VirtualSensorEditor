@@ -107,7 +107,11 @@ sn_visualization.main = (function () {
                     var deviceType = data[i].device_type;
 
                     if (deviceType in deviceTypeSensorsMap) {
-                        deviceNode.children.push(deviceTypeSensorsMap[deviceType]);
+                        var allSensors = deviceTypeSensorsMap[deviceType];
+                        var sensorArray = allSensors.split(',');
+                        $.each(sensorArray, function (index) {
+                            deviceNode.children.push({ type: "Sensor", d_uri: deviceNode.d_uri, s_id: 0, d_name: deviceNode.name, name: sensorArray[index], data: {}, children: [] });
+                        });
 
                     }
                     else {
@@ -120,7 +124,7 @@ sn_visualization.main = (function () {
                                 var sensorArray = allSensors.split(',');
                                 $.each(sensorArray, function (index) {
                                     deviceNode.children.push({ type: "Sensor", d_uri: deviceNode.d_uri, s_id: 0, d_name: deviceNode.name, name: sensorArray[index], data: {}, children: [] });
-                                    deviceTypeSensorsMap[deviceType] =  { type: "Sensor", d_uri: deviceNode.d_uri, s_id: 0, d_name: deviceNode.name, name: sensorArray[index], data: {}, children: [] }
+                                    deviceTypeSensorsMap[deviceType] =  allSensors
                                 });
                             }
                         });
