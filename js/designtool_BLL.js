@@ -154,21 +154,22 @@ function saveVirtualSensor(editingMode) {
         return false;
     }
 
-    if (editingMode == false && typeof storageObj["VIRTUAL_SENSORS"][virtualSensorName] != 'undefined') {
+    if (editingMode == false && typeof storageObj["ROOT"]["VIRTUAL_SENSORS"][virtualSensorName] != 'undefined') {
         alert("There is already a virtual sensor called " + virtualSensorName);
         return false;
     }
 
     if (editingMode) {
-        var version = parseFloat(storageObj["VIRTUAL_SENSORS"][virtualSensorName]["version"]) + 1;
+        var version = parseFloat(storageObj["ROOT"]["VIRTUAL_SENSORS"][virtualSensorName]["version"]) + 1;
     } else {
         var version = 1;
     }
 
-    storageObj["VIRTUAL_SENSORS"][virtualSensorName] = new Object();
-    storageObj["VIRTUAL_SENSORS"][virtualSensorName]["components"] = saveElementAndChildren(outputConnections[0].sourceId);
-    storageObj["VIRTUAL_SENSORS"][virtualSensorName]["source"] = outputConnections[0].sourceId;
-    storageObj["VIRTUAL_SENSORS"][virtualSensorName]["version"] = version;
+    storageObj["ROOT"]["VIRTUAL_SENSORS"][virtualSensorName] = new Object();
+    storageObj["ROOT"]["VIRTUAL_SENSORS"][virtualSensorName]["components"] = saveElementAndChildren(outputConnections[0].sourceId);
+    storageObj["ROOT"]["VIRTUAL_SENSORS"][virtualSensorName]["source"] = outputConnections[0].sourceId;
+    storageObj["ROOT"]["VIRTUAL_SENSORS"][virtualSensorName]["version"] = version;
+    storageObj["ROOT"]["VIRTUAL_SENSORS"][virtualSensorName]["name"] = virtualSensorName;
 
     persistToLocalStorage();
     populateVirtualSensorList();
@@ -227,7 +228,7 @@ function closeEditingCanvas() {
 function populateVirtualSensorList() {
     var name;
     $('#virtual_sensors_instances').html('');
-    for (name in storageObj["VIRTUAL_SENSORS"]) {
+    for (name in storageObj["ROOT"]["VIRTUAL_SENSORS"]) {
         $('#virtual_sensors_instances').append("<div draggable='true' ondragstart='drag(event)' rel='virtual' id='" + name + "' name='" + name + "'><header>" + name + "</header></div><br/>");
     }
 
@@ -238,7 +239,7 @@ function editVirtualSensor(objVirtualSensor) {
     //verify that the object about to edit is a virtual sensor
     var windowID = objVirtualSensor["id"];
     var nameVirtualSensor = $("#label_" + windowID)[0].innerHTML;
-    var vsComponents = storageObj["VIRTUAL_SENSORS"][nameVirtualSensor]["components"];
+    var vsComponents = storageObj["ROOT"]["VIRTUAL_SENSORS"][nameVirtualSensor]["components"];
 
     //clean up the canvas: visually and the timer calls
     clearCanvas();
@@ -314,15 +315,15 @@ function deleteVirtualSensor() {
     var virtualSensorName = $('#name_virtual_sensor').val().toUpperCase();
     if (confirm("Are you sure you want to delete " + virtualSensorName + "?")) {
         clearCanvas();
-        delete storageObj["VIRTUAL_SENSORS"][virtualSensorName];
+        delete storageObj["ROOT"]["VIRTUAL_SENSORS"][virtualSensorName];
         persistToLocalStorage();
         populateVirtualSensorList();
     }
 }
 
 function unfoldVirtualSensor(virtualSensorName) {
-    for (var i = 0; i < storageObj["VIRTUAL_SENSORS"][virtualSensorName]["components"].length; i++) {
-        var obj = storageObj["VIRTUAL_SENSORS"][virtualSensorName]["components"][i];
+    for (var i = 0; i < storageObj["ROOT"]["VIRTUAL_SENSORS"][virtualSensorName]["components"].length; i++) {
+        var obj = storageObj["ROOT"]["VIRTUAL_SENSORS"][virtualSensorName]["components"][i];
         globalSensorInfo[obj["uuid"]] = obj["value"];
         if (obj["value"]["category"] === "physical") {
             if (typeof globalDeviceValue[obj["value"]["deviceID"]] == "undefined") {

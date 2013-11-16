@@ -12,8 +12,9 @@ var feederCounter = 0;
 
 //object to store all virtual sensors definition and templates definition
 var storageObj = new Object;
-storageObj["VIRTUAL_SENSORS"] = new Object;
-storageObj["SETTINGS"] = new Object;
+storageObj["ROOT"] = new Object;
+storageObj["ROOT"]["VIRTUAL_SENSORS"] = new Object;
+storageObj["ROOT"]["SETTINGS"] = new Object;
 var patternVirtualSensorName = /^[a-z0-9_]{4,}$/i;
 
 //last reading time for each device
@@ -307,7 +308,7 @@ function createNewVirtualSensorInCanvas(id, data) {
     $("#" + id).append("<div id='vsFuncCont_" + id + "'><div class='sensor_value' id='sensor_value_" + id + "'>0</div></div>");
     $("#" + id).append("<div class='vsChartContainer' id='vsChartCont_" + id  + "' >&nbsp</div>");
     unfoldVirtualSensor(data.name);
-    globalSensorInfo[id] = {"category":"virtual", "name":data.name, "source": storageObj["VIRTUAL_SENSORS"][data.name]["components"][0]["uuid"]};
+    globalSensorInfo[id] = {"category":"virtual", "name":data.name, "source": storageObj["ROOT"]["VIRTUAL_SENSORS"][data.name]["components"][0]["uuid"]};
     globalSensorChartsInfo[id] = dvl();
     setupChart(id, 180, 120);
 
@@ -577,23 +578,23 @@ $.each(idReadableMapping, function (key, val) {
 
 setInterval(function () {
     sensorTimer("digital_temp");
-}, 3000);
+}, 10000);
 
 setInterval(function () {
     sensorTimer("light");
-}, 3000);
+}, 10000);
 
 setInterval(function () {
     sensorTimer("humidity");
-}, 3000);
+}, 10000);
 
 setInterval(function () {
     sensorTimer("audio_p2p");
-}, 3000);
+}, 10000);
 
 setInterval(function () {
     sensorTimer("motion");
-}, 3000);
+}, 10000);
 
 function allowDrop(ev) {
     ev.preventDefault();
