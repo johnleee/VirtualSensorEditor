@@ -210,10 +210,45 @@ function persistToLocalStorage() {
         localStorage["storageObj"] = JSON.stringify(storageObj);
         var x2js = new X2JS();
         localStorage["storageObjXml"] = x2js.json2xml_str(storageObj);
+        localStorage["storageObjXmlTaverna"] = convertXml2Taverna(localStorage["storageObjXml"]);
     }
 
     //send to node.js
     //$.get('http://127.0.0.1:1337/?op=def&vsDef=' + encodeURIComponent(JSON.stringify(storageObj)));
+}
+
+function convertXml2Taverna(xmlString) {
+    xsl=loadXMLDoc("Taverna.xsl");
+    if (window.DOMParser) {
+        parser=new DOMParser();
+        xml=parser.parseFromString(xmlString,"text/xml");
+        xsltProcessor=new XSLTProcessor();
+        xsltProcessor.importStylesheet(xsl);
+        resultDocument = xsltProcessor.transformToFragment(xml,document);
+    } else { // Internet Explorer
+        xml=new ActiveXObject("Microsoft.XMLDOM");
+        xml.async=false;
+        xml.loadXML(xmlString);
+        resultDocument=xml.transformNode(xsl);
+    }
+    console.log(resultDocument);
+    return getXmlString(resultDocument);
+}
+
+function getXmlString(xml) {
+  if (window.ActiveXObject) { return xml.xml; }
+  return new XMLSerializer().serializeToString(xml);
+}
+
+function loadXMLDoc(dname) {
+    if (window.ActiveXObject) {
+        xhttp=new ActiveXObject("Msxml2.XMLHTTP.3.0");
+    } else {
+        xhttp=new XMLHttpRequest();
+    }
+    xhttp.open("GET",dname,false);
+    xhttp.send("");
+    return xhttp.responseXML;
 }
 
 function recoverFromLocalStorage() {
