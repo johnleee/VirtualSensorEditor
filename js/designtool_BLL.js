@@ -133,16 +133,25 @@ function readSensorStatus(uuid) {
 }
 
 function createUUID(prefix) {
-    var s = [];
-    var hexDigits = "abcdefghijklmnop";
-    for (var i = 0; i < 16; i++) {
-        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
-    }
-
-    var uuid = prefix + s.join("");
-    return uuid;
+    var strings = [];
+    strings[0] = generateRandomHexString(8);
+    strings[1] = generateRandomHexString(4);
+    strings[2] = generateRandomHexString(4);
+    strings[3] = generateRandomHexString(4);
+    strings[4] = generateRandomHexString(12);
+    return prefix + strings.join("-");
 }
 
+
+function generateRandomHexString(numDigitsToOutput) {
+    var s = [];
+    var hexDigits = "0123456789abcdef";
+    for (var i = 0; i < numDigitsToOutput; i++) {
+      s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+    }
+    
+    return s.join("");
+}
 
 function saveVirtualSensor(editingMode) {
     var outputConnections = jsPlumb.getConnections({ target: 'output' });
