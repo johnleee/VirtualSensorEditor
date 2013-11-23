@@ -309,19 +309,19 @@ sn_visualization.topologicalView = (function () {
 
             for (var index in data) {
                 var
-                    offset = now.getTime() - data[index] * 1000,
-                    targetCircle = $('#topologicalView svg text[data-d_uri="' + index + '"]').parent().find('circle');
+                    offset = now.getTime() - data[index].timestamp,
+                    targetCircle = $('#topologicalView svg text[data-d_uri="' + data[index].device_id + '"]').parent().find('circle');
 
                 if (offset > 3 * 60 * 1000) {
-                    statusColorTable[index] = "red";
+                    statusColorTable[data[index].device_id] = "red";
                 }
                 else if (offset > 15 * 1000) {
-                    statusColorTable[index] = "khaki";
+                    statusColorTable[data[index].device_id] = "khaki";
                 }
                 else {
-                    statusColorTable[index] = "steelBlue";
+                    statusColorTable[data[index].device_id] = "steelBlue";
                 }
-                targetCircle.css('fill', statusColorTable[index]);
+                targetCircle.css('fill', statusColorTable[data[index].device_id]);
             }
         }
     };

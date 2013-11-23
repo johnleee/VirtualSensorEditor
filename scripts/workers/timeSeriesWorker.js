@@ -10,14 +10,15 @@ function pollData(start_time, end_time){
       if (xhr.readyState == 4) {
         if (xhr.status == 200 || xhr.status ==0) { postMessage(xhr.responseText); }
         else { throw  xhr.status+xhr.responseText; }
-        setTimeout( function(){ 
-          var lastUpdateTime = updateTime;
-          updateTime = (new Date()).getTime();
-          pollData(lastUpdateTime, updateTime);
-        }, interval);
+//        setTimeout( function(){
+//          var lastUpdateTime = updateTime;
+//          updateTime = (new Date()).getTime();
+//          pollData(lastUpdateTime, updateTime);
+//        }, interval);
       }
     };
-    xhr.open("GET",url+"?start_time="+start_time+"&end_time="+end_time, true);
+    url += "/" +  start_time + "/" + end_time + "/temp/json";
+    xhr.open("GET",url, true);
     xhr.send();
   } catch(e){ postMessage("ERROR:"+e.message);}
 }

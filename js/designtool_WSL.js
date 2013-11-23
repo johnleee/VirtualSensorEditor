@@ -1,6 +1,6 @@
 ﻿/// <reference path="designtool_PRE.js" />
 
-var using_fake_data = false;
+var using_fake_data = true;
 
 
 function setupAjaxTimer_quarentine(deviceId) {
