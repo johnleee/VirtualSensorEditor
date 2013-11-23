@@ -59,6 +59,13 @@
 
 <div id="accordion_container">
     <div id="accordion">
+		<h4>Control Flows</h4>
+        <div id="controlflows">
+			<div draggable='true' ondragstart='drag(event)' rel="cf_decision" id="cf_decision" name="DECISION">
+                 <header>Decision</header>
+            </div>
+            <br/>
+        </div>
         <h4>Temperature</h4>
         <div id="temp">
             <br/>
@@ -88,13 +95,7 @@
         <h4>Motion</h4>
         <div id="motion">
         </div>
-		<h4>Control Flows</h4>
-        <div id="controlflows">
-			<div draggable='true' ondragstart='drag(event)' rel="controlflows" id="algo_average" name="Decision">
-                 <header>Decision</header>
-            </div>
-            <br/>
-        </div>
+		
         <h4 id="virtual_sensors_instances_title">Virtual sensors</h4>
         <div id="virtual_sensors_instances">
         </div>
