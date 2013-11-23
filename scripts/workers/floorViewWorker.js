@@ -1,6 +1,6 @@
 
 function pollSensorData(url, interval, sensorType) {
-    url += "/" + sensorType + "/json"
+    url += sensorType + "/json"
     try {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
@@ -26,11 +26,11 @@ self.addEventListener('message', function (e) {
     switch (e.data.type) {
         case "START":
             url = e.data.url;
-            var timestamp = new Date()
-            timestamp.setMinutes(timestamp.getMinutes()-1)
-            url += timestamp.getTime()
+//            var timestamp = new Date()
+//            timestamp.setMinutes(timestamp.getMinutes()-1)
+//            url += timestamp.getTime()
 //            var sensorTypes = new Array("temp","digital_temp","light", "pressure", "humidity", "motion", "audio_p2p", "acc_x", "acc_y", "acc_z");
-            var sensorTypes = new Array("temp");
+            var sensorTypes = new Array("light");
             for (var i in sensorTypes) {
                 pollSensorData(url, interval, sensorTypes[i])
             }
