@@ -194,6 +194,9 @@ function createNewElementInCanvas(type, x, y, data, uuid) {
         case 'monitor':
             createNewMonitorInCanvas(id, data);
             break;
+		case 'cf_decision':
+            createNewControlFlowInCanvas(id, data);
+            break;
         default:
             createNewPhysicalSensorInCanvas(id, data);
             break;
@@ -353,6 +356,47 @@ function createNewTemplateInCanvas(id, data) {
         }
     } else {
         addTargetEndpoint($("#" + id), true);
+    }
+
+    globalSensorInfo[id] = {"category":"custom", name: data.name};
+    globalSensorChartsInfo[id] = dvl();
+    setupChart(id, 275, 195);
+    var setIntervalId = setInterval(function () {
+        if ($("#hidden_field_is_valid_" + id).val() === "false")
+            return;
+        $("#sensor_value_" + id).css("color", readSensorStatus(id));
+        var temp = readSensorData(id, true);
+        $("#sensor_value_" + id).html(temp);
+        globalSensorChartsInfo[id].value(temp);
+    }, 1000);
+
+    globalSensorInfo[id]["setIntervalId"] = setIntervalId;
+}
+
+function createNewControlFlowInCanvas(id, data) {
+    if (typeof data.expression != 'undefined') {
+        var expression = data.expression;
+    }else{
+        var expression = "";
+    }
+    $('<div class="window" id="' + id + '" >').appendTo('#design_canvas');
+    $("#" + id).append("<div class='shape ui-draggable _jsPlumb_endpoint_anchor_' data-shape='Diamond' style='left: 582px; top: 180px;'>" +
+		"<textarea class='code_cfdecision' id=textarea_" + id + " contenteditable='true'>" + expression + "</textarea><br/>" +
+    	"<input type='button' class='btn' value='Set' name='" + id + "' onclick='setCustomFunction(\"" + id + "\");'  />" +
+		"&nbsp; &nbsp; &nbsp; <span class='sensor_value' style='display:inline-block;' id='sensor_value_" + id + "' >False</span>"+
+    	"<input type='hidden' id='hidden_code_" + id + "' />"+
+    	"<input type='hidden' id='hidden_field_is_valid_" + id + "' value='false' />"+
+	    "<input type='hidden' id='hidden_field_status_sensor_value_" + id + "' />"+
+    	"<input type='hidden' id='hidden_field_uuid_" + id + "' value='" + createUUID("c") + "'/></div>"+
+		"</div>");
+    jsPlumb.addEndpoint($("#" + id), sourceEndpoint);
+
+    if (typeof data.children != 'undefined' && data.children.length > 1) {
+        for (var i = 0; i < data.children.length; i++) {
+            addTargetEndpoint($("#" + id), true);
+        }
+    } else {
+        addTargetEndpoint($("#" + id), true);		
     }
 
     globalSensorInfo[id] = {"category":"custom", name: data.name};
@@ -611,14 +655,16 @@ function drop_window(ev) {
     var dt = ev.dataTransfer;
     if (!dt) {
         return;
-    }
+    }	
     var str = dt.getData("TEXT").split(" ");
     var category = str[1];
     var name = str[2];
     var deviceID = str[0];
-
+	console.log(str);
+	console.log("deviceId: " + deviceID + " category: " + category + " name: " + name);
+	
     if (category === "template" || category === "virtual" || category === "feeder" || category==="monitor" ||
-        category === 'algorithm') {
+        category === 'algorithm' || category === "cf_decision") {
         createNewElementInCanvas(category, ev.clientX, ev.clientY, {name:name});
     } else {
         if (deviceID) {
