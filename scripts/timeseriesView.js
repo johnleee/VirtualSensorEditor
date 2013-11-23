@@ -27,9 +27,15 @@ sn_visualization.timeseriesView = (function(){
       dataWorkers[deviceURI].worker.addEventListener(
         'message', function(e){
           var data = JSON.parse(e.data);
+
+//          if (data.hasAttribute("log")) {
+//              console.log(data.log);
+//              return;
+//
+//          }
           $('.timeseriesView[data-d_uri="'+deviceURI+'"] img.loading').remove();
           $('.timeseriesView[data-d_uri="'+deviceURI+'"] svg').remove();
-          updateCache(deviceURI, data, (new Date()).getTime());
+          updateCache(deviceURI, data, 1370981956000);
           for(var i=0; i<dataWorkers[deviceURI].metrics.length; ++i){
             drawData(
               dataCache[deviceURI].data,
@@ -53,9 +59,12 @@ sn_visualization.timeseriesView = (function(){
       );
       dataWorkers[deviceURI].worker.postMessage({
         type: "START",
-        url: "http://cmu-sds.herokuapp.com/sensor_readings/"+deviceURI,
-        init_time: (fetchTime-timeLength*1000),
-        update_time: fetchTime
+//        url: "http://cmu-sds.herokuapp.com/sensor_readings/"+deviceURI,
+        url: "http://einstein.sv.cmu.edu/sensors/"+deviceURI,
+//        init_time: (fetchTime-timeLength*1000),
+//        update_time: fetchTime
+          init_time: 1370981956000,
+          update_time: 1370985556000
       });
     },
     removeWorker = function(deviceURI){
