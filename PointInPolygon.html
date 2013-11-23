@@ -30,14 +30,14 @@
 				c2.fillRect(x,y,3,3);
 				$("#result1").val(inside);
 
-				//create array for jordan curve theorom
+				//create array for jordan curve theorem
 				var polygonNumbers = [new Point(0,0),new Point(100,50),new Point(50,100),new Point(0,90)];
 				rayInside = pointInPoly(new Point(x,y),polygonNumbers);
 				$("#result2").val(rayInside);
 
 			}
 
-			//Jordan Curve Theorom
+			//Jordan Curve Theorem
 			//http://stackoverflow.com/questions/217578/point-in-polygon-aka-hit-test
 			//http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
 			//I run a semi-infinite ray horizontally (increasing x, fixed y) out from the test point, and count how many edges it crosses. At each crossing, the ray switches between inside and outside. This is called the Jordan curve theorem.
@@ -120,7 +120,7 @@
             	X: <input type="number" name="x" id="x"> 
             	Y: <input type="number" name="y" id="y"><br>
             	<input type="button" onclick="pointInPolygon();" value="Is Point In Polygon" class="btn btn-success"><br>
-            	Jordan Curve THer: <input type="string" id="result1" readonly="true"><br>
+            	Jordan Curve Theorem: <input type="string" id="result1" readonly="true"><br>
             	Ray-Casting Algorithm: <input type="string" id="result2" readonly="true">
         </div>
         
