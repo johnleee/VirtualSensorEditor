@@ -74,7 +74,7 @@ sn_visualization.main = (function () {
             );
             pollingWorker.postMessage({
                 type: "START",
-                url: "http://einstein.sv.cmu.edu/last_readings_from_all_devices/"
+                url: "http://einstein.sv.cmu.edu/lastest_readings_from_all_devices/"
             });
         },
     //        Build d3 tree root > Gateway (SensorAndrew0 etc.) > Device (B...) > Sensors (temp, light etc.)
