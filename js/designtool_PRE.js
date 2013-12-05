@@ -97,6 +97,23 @@ var connectorPaintStyle = {
         dragOptions:{},
         anchors:[ "BottomCenter"]
     },
+	sourceEndpoint2 = {
+        endpoint:"Dot",
+        paintStyle:{
+            strokeStyle:"#2e2aF8",
+            fillStyle:"transparent",
+            radius:7,
+            lineWidth:2
+        },
+        isSource:true,
+        maxConnections:-1,
+        connector:[ "Bezier", { curviness:100 } ],
+        connectorStyle:connectorPaintStyle,
+        hoverPaintStyle:endpointHoverStyle,
+        connectorHoverStyle:connectorHoverStyle,
+        dragOptions:{},
+        anchors:[ "RightMiddle"]
+    },
 // a source endpoint that sits at BottomCenter
 //	bottomSource = jsPlumb.extend( { anchor:"BottomCenter" }, sourceEndpoint),
 // the definition of target endpoints (will appear when the user drags a connection)
@@ -356,6 +373,7 @@ function createNewTemplateInCanvas(id, data) {
         }
     } else {
         addTargetEndpoint($("#" + id), true);
+
     }
 
     globalSensorInfo[id] = {"category":"custom", name: data.name};
@@ -373,23 +391,37 @@ function createNewTemplateInCanvas(id, data) {
     globalSensorInfo[id]["setIntervalId"] = setIntervalId;
 }
 
+function setDecisionBranches(id, id2) {
+	setCustomFunction(id);
+	setCustomFunction(id2);
+}
+
 function createNewControlFlowInCanvas(id, data) {
+	var id2 = createUUID("");
     if (typeof data.expression != 'undefined') {
         var expression = data.expression;
     }else{
         var expression = "";
     }
     $('<div class="window" id="' + id + '" >').appendTo('#design_canvas');
-    $("#" + id).append("<div class='shape ui-draggable _jsPlumb_endpoint_anchor_' data-shape='Diamond' style='left: 582px; top: 180px;'>" +
+    $("#" + id).append("<div class='shape ui-draggable _jsPlumb_endpoint_anchor_'>" +
 		"<textarea class='code_cfdecision' id=textarea_" + id + " contenteditable='true'>" + expression + "</textarea><br/>" +
     	"<input type='button' class='btn' value='Set' name='" + id + "' onclick='setCustomFunction(\"" + id + "\");'  />" +
 		"&nbsp; &nbsp; &nbsp; <span class='sensor_value' style='display:inline-block;' id='sensor_value_" + id + "' >False</span>"+
+		"&nbsp; &nbsp; &nbsp; <span class='sensor_value' style='display:inline-block; float:right;' id='sensor_value_" + id2 + "' >False</span>"+
     	"<input type='hidden' id='hidden_code_" + id + "' />"+
     	"<input type='hidden' id='hidden_field_is_valid_" + id + "' value='false' />"+
 	    "<input type='hidden' id='hidden_field_status_sensor_value_" + id + "' />"+
     	"<input type='hidden' id='hidden_field_uuid_" + id + "' value='" + createUUID("c") + "'/></div>"+
+		"<input type='hidden' id='hidden_code_" + id2 + "' />"+
+    	"<input type='hidden' id='hidden_field_is_valid_" + id2 + "' value='false' />"+
+	    "<input type='hidden' id='hidden_field_status_sensor_value_" + id2 + "' />"+
+    	"<input type='hidden' id='hidden_field_uuid_" + id2 + "' value='" + createUUID("d") + "'/></div>"+
 		"</div>");
-    jsPlumb.addEndpoint($("#" + id), sourceEndpoint);
+	
+	jsPlumb.addEndpoint($("#" + id), sourceEndpoint);
+	jsPlumb.addEndpoint($("#" + id), sourceEndpoint2);
+
 
     if (typeof data.children != 'undefined' && data.children.length > 1) {
         for (var i = 0; i < data.children.length; i++) {
