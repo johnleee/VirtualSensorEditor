@@ -11,33 +11,230 @@
 
 	    <script src="js/lib/jquery-1.9.0-min.js"></script>
 	    <script src="js/lib/jquery-ui-1.9.2-min.js"></script>
-	    <script src="scripts/pointInPolygon.js"></script>
+        <style type = "text/css">
+            table, td, th {
+              border: 1px solid black;
+            } 
+        </style>
+	    
 	</head>
     
     <body>
-    	<div class="container">
-        	<canvas id="c" />
-        </div>
-        
         <div class="container">
+            <h2>Carnegie Mellon Rooms</h2>
+            <table>
+              <tr>
+                <th>Room</th>
+                <th>GPS Coordinates X</th>
+                <th>GPS Coordinates Y</th>
+              </tr>
+              <tr>
+                <td>Room 110 NE</td>
+                <td><input type="double" id="110NEX" readonly="true" value="37.410632"></td>
+                <td><input type="double" id="110NEY" readonly="true" value="-122.059514"></td>
+              </tr>
+              <tr>
+                <td>Room 110 SE</td>
+                <td><input type="double" id="110SEX" readonly="true" value="37.410502"></td>
+                <td><input type="double" id="110SEY" readonly="true" value="-122.059447"></td>
+              </tr>
+              <tr>
+                <td>Room 110 SW</td>
+                <td><input type="double" id="110SWX" readonly="true" value="37.410466"></td>
+                <td><input type="double" id="110SWY" readonly="true" value="-122.059562"></td>
+              </tr>
+              <tr>
+                <td>Room 110 NW</td>
+                <td><input type="double" id="110NWX" readonly="true" value="37.410603"></td>
+                <td><input type="double" id="110NWY" readonly="true" value="-122.059632"></td>
+              </tr>
+              <tr>
+                <td>Enter X & Y</td>
+                <td><input type="double" id="110_POINT_X" value="37.410566" ></td>
+                <td><input type="double" id="110_POINT_Y" value="-122.059538"></td>
+              </tr>
+              <tr>
+                <td><input type="button" onclick="pointInPolygon110();" value="Is Point In Room 110" class="btn btn-success"></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Jordan Curve Theorem: </td>
+                <td><input type="string" id="result_110_1" readonly="true"></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Ray-Casting Algorithm: </td>
+                <td><input type="string" id="result_110_2" readonly="true"></td>
+                <td></td>
+              </tr>
+              <tr>
+                 <th>Room</th>
+                <th>GPS Coordinates X</th>
+                <th>GPS Coordinates Y</th>
+              <tr>
+                <td>Room 118 NE</td>
+                <td><input type="double" id="118NEX" readonly="true" value="37.410489"></td>
+                <td><input type="double" id="118NEY" readonly="true" value="-122.059980"></td>
+              </tr>
+              <tr>
+                <td>Room 118 SE</td>
+                <td><input type="double" id="118SEX" readonly="true" value="37.410355"></td>
+                <td><input type="double" id="118SEY" readonly="true" value="-122.059900"></td>
+              </tr>
+              <tr>
+                <td>Room 118 SW</td>
+                <td><input type="double" id="118SWX" readonly="true" value="37.410318"></td>
+                <td><input type="double" id="118SWY" readonly="true" value="-122.060013"></td>
+              </tr>
+              <tr>
+                <td>Room 118 NW</td>
+                <td><input type="double" id="118NWX" readonly="true" value="37.410454"></td>
+                <td><input type="double" id="118NWY" readonly="true" value="-122.060084"></td>
+              </tr>
+               <tr>
+                <td>Enter X & Y</td>
+                <td><input type="double" id="118_POINT_X" value="37.410566" ></td>
+                <td><input type="double" id="118_POINT_Y" value="-122.059538"></td>
+              </tr>
+              <tr>
+                <td><input type="button" onclick="pointInPolygon118();" value="Is Point In Room 118" class="btn btn-success"></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Jordan Curve Theorem: </td>
+                <td><input type="string" id="result_118_1" readonly="true"></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Ray-Casting Algorithm: </td>
+                <td><input type="string" id="result_118_2" readonly="true"></td>
+                <td></td>
+              </tr>
+            </table>
+        </div>
+        <div class="container">
+                <h2>Enter X and Y coordinates to test if point is in polygon. </h2>
+                <h4>Polygon's four points are (0,0) (100,50) (50,100) (0,90). Canvas is 300 by 300 pixels.</h4>
             	X: <input type="number" name="x" id="x"> 
             	Y: <input type="number" name="y" id="y"><br>
             	<input type="button" onclick="pointInPolygon();" value="Is Point In Polygon" class="btn btn-success"><br>
             	Jordan Curve Theorem: <input type="string" id="result1" readonly="true"><br>
             	Ray-Casting Algorithm: <input type="string" id="result2" readonly="true">
         </div>
-        
-        <script>
-	       var c2 = document.getElementById('c').getContext('2d');
-		   c2.fillStyle = '#f00';
-		   c2.beginPath();
-		   c2.moveTo(0, 0);
-		   c2.lineTo(100, 50);
-		   c2.lineTo(50, 100);
-		   c2.lineTo(0, 90);
-		   c2.closePath();
-		   c2.fill();
+        <div class="container">
+            <canvas id="c" width="300" height="300" />
+        </div>
+       
+         <script src="scripts/pointInPolygon.js"></script>
+         <script type="text/javascript">
+            var NEX = 0;
+            var NEY = 0;
+            var SEX = 100;
+            var SEY = 50;
+            var SWX = 50;
+            var SWY = 100;
+            var NWX = 0;
+            var NWY = 90;
 
+
+            var c2 = document.getElementById('c').getContext('2d');
+             c2.fillStyle = '#f00';
+             c2.beginPath();
+             c2.moveTo(NEX, NEY);
+             c2.lineTo(SEX, SEY);
+             c2.lineTo(SWX, SWY);
+             c2.lineTo(NWX, NWY);
+
+             c2.closePath();
+             c2.fill();
+
+
+            function pointInPolygon110() {
+              var NEX = parseFloat($("#110NEX").val());
+              var NEY = parseFloat($("#110NEY").val());
+              var SEX = parseFloat($("#110SEX").val());
+              var SEY = parseFloat($("#110SEY").val());
+              var SWX = parseFloat($("#110SWX").val());
+              var SWY = parseFloat($("#110SWY").val());
+              var NWX = parseFloat($("#110NWX").val());
+              var NWY = parseFloat($("#110NWY").val());
+              var x = parseFloat($("#110_POINT_X").val());
+              var y = parseFloat($("#110_POINT_Y").val());
+              
+              //create array for ray casting algorithm
+              var polygons = new Array();
+              polygons[0] = {x:NEX,y:NEY};
+              polygons[1] = {x:SEX,y:SEY};
+              polygons[2] = {x:SWX,y:SWY};
+              polygons[3] = {x:NWX,y:NWY};
+
+              inside = isPointInPolygonUsingJordanCurve(polygons, x, y);  
+
+              $("#result_110_1").val(inside);
+
+              //create array for jordan curve theorem
+              var polygonNumbers = [new Point(NEX,NEY),new Point(SEX,SEY),new Point(SWX,SWY),new Point(NWX,NWY)];
+              rayInside = isPointInPolygonUsingRayCasting(new Point(x,y),polygonNumbers);
+
+              $("#result_110_2").val(rayInside);
+            }
+
+            function pointInPolygon118() {
+              var NEX = parseFloat($("#118NEX").val());
+              var NEY = parseFloat($("#118NEY").val());
+              var SEX = parseFloat($("#118SEX").val());
+              var SEY = parseFloat($("#118SEY").val());
+              var SWX = parseFloat($("#118SWX").val());
+              var SWY = parseFloat($("#118SWY").val());
+              var NWX = parseFloat($("#118NWX").val());
+              var NWY = parseFloat($("#118NWY").val());
+              var x = parseFloat($("#118_POINT_X").val());
+              var y = parseFloat($("#118_POINT_Y").val());
+              
+              //create array for ray casting algorithm
+              var polygons = new Array();
+              polygons[0] = {x:NEX,y:NEY};
+              polygons[1] = {x:SEX,y:SEY};
+              polygons[2] = {x:SWX,y:SWY};
+              polygons[3] = {x:NWX,y:NWY};
+
+              inside = isPointInPolygonUsingJordanCurve(polygons, x, y);  
+
+              $("#result_118_1").val(inside);
+
+              //create array for jordan curve theorem
+              var polygonNumbers = [new Point(NEX,NEY),new Point(SEX,SEY),new Point(SWX,SWY),new Point(NWX,NWY)];
+              rayInside = isPointInPolygonUsingRayCasting(new Point(x,y),polygonNumbers);
+
+              $("#result_118_2").val(rayInside);
+            }
+
+            function pointInPolygon() {
+              var x = $("#x").val();
+              var y = $("#y").val();
+              
+              //create array for ray casting algorithm
+              var polygons = new Array();
+              polygons[0] = {x:NEX,y:NEY};
+              polygons[1] = {x:SEX,y:SEY};
+              polygons[2] = {x:SWX,y:SWY};
+              polygons[3] = {x:NWX,y:NWY};
+
+              inside = isPointInPolygonUsingJordanCurve(polygons, x, y);  
+
+              var c2 = document.getElementById('c').getContext('2d');
+              c2.fillStyle = 'blue';
+              c2.fillRect(x,y,3,3);
+              $("#result1").val(inside);
+
+              //create array for jordan curve theorem
+              var polygonNumbers = [new Point(NEX,NEY),new Point(SEX,SEY),new Point(SWX,SWY),new Point(NWX,NWY)];
+              rayInside = isPointInPolygonUsingRayCasting(new Point(x,y),polygonNumbers);
+
+              $("#result2").val(rayInside);
+            }
          </script>
     </body>
 </html>
