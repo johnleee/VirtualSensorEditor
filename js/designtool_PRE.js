@@ -121,7 +121,7 @@ var connectorPaintStyle = {
         endpoint:"Dot",
         paintStyle:{ fillStyle:"#2e2aF8", radius:7},
         hoverPaintStyle:endpointHoverStyle,
-        maxConnections:1,
+        maxConnections:2,
         dropOptions:{ hoverClass:"hover", activeClass:"active" },
         isTarget:true,
         anchor:[0.2, 0, 0, -1]
@@ -131,7 +131,7 @@ var connectorPaintStyle = {
         endpoint:"Dot",
         paintStyle:{ fillStyle:"#2e2aF8", radius:7 },
         hoverPaintStyle:endpointHoverStyle,
-        maxConnections:1,
+        maxConnections:2,
         dropOptions:{ hoverClass:"hover", activeClass:"active" },
         isTarget:true,
         anchors:["TopCenter"],
@@ -395,6 +395,10 @@ function setDecisionBranches(id, id2) {
 	setCustomFunction(id);
 	setCustomFunction(id2);
 }
+function toggleFlag(value){
+   var toggle = value ? new Boolean(false) : new Boolean(true);
+   return toggle;
+}
 
 function createNewControlFlowInCanvas(id, data) {
 	var id2 = createUUID("");
@@ -406,18 +410,18 @@ function createNewControlFlowInCanvas(id, data) {
     $('<div class="window" id="' + id + '" >').appendTo('#design_canvas');
     $("#" + id).append("<div class='shape ui-draggable _jsPlumb_endpoint_anchor_'>" +
 		"<textarea class='code_cfdecision' id=textarea_" + id + " contenteditable='true'>" + expression + "</textarea><br/>" +
-    	"<input type='button' class='btn' value='Set' name='" + id + "' onclick='setCustomFunction(\"" + id + "\");'  />" +
+    	"<input type='button' class='btn' value='Set' name='" + id + "' onclick='setDecisionBranches(\"" + id + "\", \"" + id2 + "\");'  />" +
 		"&nbsp; &nbsp; &nbsp; <span class='sensor_value' style='display:inline-block;' id='sensor_value_" + id + "' >False</span>"+
 		"&nbsp; &nbsp; &nbsp; <span class='sensor_value' style='display:inline-block; float:right;' id='sensor_value_" + id2 + "' >False</span>"+
     	"<input type='hidden' id='hidden_code_" + id + "' />"+
     	"<input type='hidden' id='hidden_field_is_valid_" + id + "' value='false' />"+
 	    "<input type='hidden' id='hidden_field_status_sensor_value_" + id + "' />"+
-    	"<input type='hidden' id='hidden_field_uuid_" + id + "' value='" + createUUID("c") + "'/></div>"+
+    	"<input type='hidden' id='hidden_field_uuid_" + id + "' value='" + createUUID("c") + 
 		"<input type='hidden' id='hidden_code_" + id2 + "' />"+
     	"<input type='hidden' id='hidden_field_is_valid_" + id2 + "' value='false' />"+
 	    "<input type='hidden' id='hidden_field_status_sensor_value_" + id2 + "' />"+
-    	"<input type='hidden' id='hidden_field_uuid_" + id2 + "' value='" + createUUID("d") + "'/></div>"+
-		"</div>");
+    	"<input type='hidden' id='hidden_field_uuid_" + id2 + "' value='" + createUUID("d") + 
+		"'/></div>");
 	
 	jsPlumb.addEndpoint($("#" + id), sourceEndpoint);
 	jsPlumb.addEndpoint($("#" + id), sourceEndpoint2);
@@ -434,13 +438,24 @@ function createNewControlFlowInCanvas(id, data) {
     globalSensorInfo[id] = {"category":"custom", name: data.name};
     globalSensorChartsInfo[id] = dvl();
     setupChart(id, 275, 195);
+	
     var setIntervalId = setInterval(function () {
         if ($("#hidden_field_is_valid_" + id).val() === "false")
             return;
         $("#sensor_value_" + id).css("color", readSensorStatus(id));
+		$("#sensor_value_" + id2).css("color", readSensorStatus(id));
         var temp = readSensorData(id, true);
-        $("#sensor_value_" + id).html(temp);
+		$("#sensor_value_" + id).html(temp);	
+		if (temp == true) {	
+			$("#sensor_value_" + id2).html(new Boolean(false));
+		}
+		else {
+			$("#sensor_value_" + id2).html(new Boolean(true));
+		}
+       
         globalSensorChartsInfo[id].value(temp);
+		jsPlumb.repaintEverything();
+		
     }, 1000);
 
     globalSensorInfo[id]["setIntervalId"] = setIntervalId;
