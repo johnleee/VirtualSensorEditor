@@ -87,7 +87,7 @@ sn_visualization.topologicalView = (function () {
                         if (statusColorTable.hasOwnProperty(d.d_uri)) {
                             return statusColorTable[d.d_uri];
                         }
-                        return d._children ? "lightsteelblue" : "#fff";
+                        return d._children ? "red" : "#fff";
                     });
 
                 nodeEnter.append("svg:text")
@@ -131,7 +131,7 @@ sn_visualization.topologicalView = (function () {
                         if (statusColorTable.hasOwnProperty(d.d_uri)) {
                             return statusColorTable[d.d_uri];
                         }
-                        return d._children ? "lightsteelblue" : "#fff";
+                        return d._children ? "red" : "#fff";
                     });
 
                 nodeUpdate.select("text")
