@@ -61,10 +61,10 @@ sn_visualization.timeseriesView = (function(){
         type: "START",
 //        url: "http://cmu-sds.herokuapp.com/sensor_readings/"+deviceURI,
         url: "http://einstein.sv.cmu.edu/sensors/"+deviceURI,
-//        init_time: (fetchTime-timeLength*1000),
-//        update_time: fetchTime
-          init_time: 1370981956000,
-          update_time: 1370985556000
+        init_time: (fetchTime-timeLength*1000),
+        update_time: fetchTime
+//          init_time: 1370981956000,
+//          update_time: 1370985556000
       });
     },
     removeWorker = function(deviceURI){
